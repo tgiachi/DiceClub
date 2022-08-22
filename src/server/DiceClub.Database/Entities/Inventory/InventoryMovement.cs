@@ -28,6 +28,8 @@ namespace DiceClub.Database.Entities.Inventory
 
         public DiceClubUser Approver { get; set; }
 
+        public bool IsApproved { get; set; }
+
     }
 
     public enum InventoryMovementType

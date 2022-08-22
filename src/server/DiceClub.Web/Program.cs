@@ -1,49 +1,96 @@
+using System.Text;
+using Aurora.Api.Entities.MethodEx;
+using Aurora.Api.Utils;
+using Aurora.Turbine.Api.Data;
+using Aurora.Turbine.Api.Services;
+using DiceClub.Database.Context;
+using DiceClub.Services.Modules;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+
 namespace DiceClub.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            AssemblyUtils.AddAssembly(typeof(EventListenerModuleLoader).Assembly);
 
-            // Add services to the container.
-            builder.Services.AddAuthorization();
+            var logConfig = new LoggerConfiguration()
+                .MinimumLevel.ControlledBy(new LoggingLevelSwitch(LogEventLevel.Information))
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+                .Enrich.FromLogContext();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            var turbine = new TurbineWebEngine();
 
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            var builder = await turbine.Build(new TurbineConfig()
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
 
-            app.UseAuthorization();
+                IsMapControllers = true,
+                UseSwagger = true
+            });
 
-            var summaries = new[]
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+            });
 
-            app.MapGet("/weatherforecast", (HttpContext httpContext) =>
+
+            await turbine.InitLogger(logConfig);
+
+            
+
+            turbine.ConfigureServices((builder, config) =>
             {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast
-                    {
-                        Date = DateTime.Now.AddDays(index),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = summaries[Random.Shared.Next(summaries.Length)]
-                    })
-                    .ToArray();
-                return forecast;
-            })
-            .WithName("GetWeatherForecast");
+                builder
+                    .AddEntitiesDataAccess()
+                    .AddDbSeedService()
+                    .AddDtoMappers();
+                return builder;
+            });
 
-            app.Run();
+            
+
+            turbine.OnTurbineAppBuilt += application => 
+            {
+                
+
+                application.UseDefaultFiles();
+                application.UseStaticFiles();
+                application.UseAuthentication();
+                
+
+                return Task.CompletedTask;
+            };
+
+            turbine.AddContextFactory<DiceClubDbContext>(optionsBuilder =>
+            {
+
+                optionsBuilder
+                    .UseNpgsql(
+                        @"Server=127.0.0.1;Port=5432;Database=diceclub_db;User Id=postgres;Password=password;")
+                    .UseSnakeCaseNamingConvention();
+            }, true);
+
+
+
+            await turbine.Run();
         }
     }
 }

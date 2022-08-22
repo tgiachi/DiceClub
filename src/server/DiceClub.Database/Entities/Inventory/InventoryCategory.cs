@@ -15,5 +15,7 @@ namespace DiceClub.Database.Entities.Inventory
         public string Name { get; set; }
 
         public virtual List<Inventory> Inventories { get; set; }
+
+        public string? ParserType { get; set; }
     }
 }

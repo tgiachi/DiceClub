@@ -5,9 +5,11 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiceClub.Database", "DiceClub.Database\DiceClub.Database.csproj", "{7B8FCCF2-E375-432C-AC29-3FA1FC5494DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceClub.Web", "DiceClub.Web\DiceClub.Web.csproj", "{693CF1D1-CB7B-4BA1-877E-9B272983FEA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiceClub.Web", "DiceClub.Web\DiceClub.Web.csproj", "{693CF1D1-CB7B-4BA1-877E-9B272983FEA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceClub.Services", "DiceClub.Services\DiceClub.Services.csproj", "{B65D51B4-6A2F-4AB1-9FEE-5AC192FBF11B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiceClub.Services", "DiceClub.Services\DiceClub.Services.csproj", "{B65D51B4-6A2F-4AB1-9FEE-5AC192FBF11B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceClub.Api", "DiceClub.Api\DiceClub.Api.csproj", "{745F83D2-72BD-4F7F-BA40-57DD81C598D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{B65D51B4-6A2F-4AB1-9FEE-5AC192FBF11B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B65D51B4-6A2F-4AB1-9FEE-5AC192FBF11B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B65D51B4-6A2F-4AB1-9FEE-5AC192FBF11B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{745F83D2-72BD-4F7F-BA40-57DD81C598D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{745F83D2-72BD-4F7F-BA40-57DD81C598D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{745F83D2-72BD-4F7F-BA40-57DD81C598D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{745F83D2-72BD-4F7F-BA40-57DD81C598D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
