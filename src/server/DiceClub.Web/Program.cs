@@ -2,10 +2,13 @@ using System.Text;
 using Aurora.Api.Entities.MethodEx;
 using Aurora.Api.Utils;
 using Aurora.Turbine.Api.Data;
+using Aurora.Turbine.Api.MethodEx;
 using Aurora.Turbine.Api.Services;
 using DiceClub.Database.Context;
 using DiceClub.Services.Modules;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -46,7 +49,7 @@ namespace DiceClub.Web
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                 };
             });
@@ -61,6 +64,7 @@ namespace DiceClub.Web
                 builder
                     .AddEntitiesDataAccess()
                     .AddDbSeedService()
+                    .AddTurbineRestServices()
                     .AddDtoMappers();
                 return builder;
             });
@@ -74,6 +78,7 @@ namespace DiceClub.Web
                 application.UseDefaultFiles();
                 application.UseStaticFiles();
                 application.UseAuthentication();
+                application.UseAuthorization();
                 
 
                 return Task.CompletedTask;
@@ -88,6 +93,17 @@ namespace DiceClub.Web
                     .UseSnakeCaseNamingConvention();
             }, true);
 
+
+
+            builder.Services.AddApiVersioning(options => {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                //    options.ReportApiVersions = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version"),
+                    new HeaderApiVersionReader("X-Version"),
+                    new MediaTypeApiVersionReader("ver"));
+            });
 
 
             await turbine.Run();

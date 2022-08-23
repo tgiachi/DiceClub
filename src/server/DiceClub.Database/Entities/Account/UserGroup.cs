@@ -14,9 +14,7 @@ namespace DiceClub.Database.Entities.Account
     {
         public Guid UserId { get; set; }
         public DiceClubUser User { get; set; }
-
         public Guid GroupId { get; set; }
-
         public DiceClubGroup Group { get; set; }
     }
 }

@@ -33,5 +33,8 @@ namespace DiceClub.Database.Entities.Account
 
         [MaxLength(250)]
         public string SerialId { get; set; }
+
+        [MaxLength(100)]
+        public string? RefreshToken { get; set; }
     }
 }
