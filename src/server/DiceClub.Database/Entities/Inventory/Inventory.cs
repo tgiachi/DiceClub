@@ -23,6 +23,7 @@ namespace DiceClub.Database.Entities.Inventory
 
         public DiceClubUser? Owner { get; set; }
 
+        public Guid? OwnerId { get; set; }
         public Guid CategoryId { get; set; }
 
         public InventoryCategory Category { get; set; }
