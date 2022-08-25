@@ -18,6 +18,12 @@ namespace DiceClub.Database.Dao
     {
         public InventoryDao(IDbContextFactory<DiceClubDbContext> dbContext, ILogger<Inventory> logger) : base(dbContext, logger)
         {
+
+        }
+
+        public Task<Inventory> ByIdWithCategory(Guid id)
+        {
+            return QueryAsSingle(queryable => queryable.Where(s => s.Id == id).Include(k => k.Category));
         }
     }
 }

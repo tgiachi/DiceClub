@@ -16,6 +16,9 @@ namespace DiceClub.Database.Entities.Inventory
     {
         public string Name { get; set; }
 
+        [MaxLength(200)]
+        public string? Author { get; set; }
+
         [MaxLength(3000)]
         public string Description { get; set; }
 

@@ -48,13 +48,14 @@ namespace DiceClub.Web.Controllers.Auth
                 claims.Add(new Claim(ClaimTypes.Role, group.Group.GroupName));
             }
 
+            var expire = DateTime.UtcNow.AddDays(1);
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(100),
+                expires: expire,
                 signingCredentials: signIn);
 
             var refreshToken = GenerateRefreshToken();
@@ -62,7 +63,7 @@ namespace DiceClub.Web.Controllers.Auth
             await _diceClubUserDao.UpdateRefreshToken(user.Email, refreshToken);
 
             return new LoginResponseData
-            { AccessToken = new JwtSecurityTokenHandler().WriteToken(token), RefreshToken = refreshToken };
+            { AccessToken = new JwtSecurityTokenHandler().WriteToken(token), RefreshToken = refreshToken, AccessTokenExpire = expire };
         }
 
 
