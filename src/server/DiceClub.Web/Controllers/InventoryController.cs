@@ -68,7 +68,6 @@ namespace DiceClub.Web.Controllers
             }
 
             return Ok(_inventoryDtoMapper.ToDto(inventory));
-
         }
     }
 }

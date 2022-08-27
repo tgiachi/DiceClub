@@ -7,6 +7,7 @@ import original from "react95/dist/themes/index";
 // original Windows95 font (optionally)
 import ms_sans_serif from "react95/dist/fonts/ms_sans_serif.woff2";
 import ms_sans_serif_bold from "react95/dist/fonts/ms_sans_serif_bold.woff2";
+import { StoreContext, initialValues } from "./stores/store.context";
 // pick a theme of your choice
 
 const GlobalStyles = createGlobalStyle`
@@ -29,17 +30,19 @@ const GlobalStyles = createGlobalStyle`
 `;
 
 const App = () => (
-  <div>
-    <GlobalStyles />
-    <ThemeProvider theme={original}>
-      <MenuList>
-        <MenuListItem>🎤 Sing</MenuListItem>
-        <MenuListItem>💃🏻 Dance</MenuListItem>
-        <Separator />
-        <MenuListItem disabled>😴 Sleep</MenuListItem>
-      </MenuList>
-    </ThemeProvider>
-  </div>
+	<StoreContext.Provider value={initialValues}>
+		<div>
+			<GlobalStyles />
+			<ThemeProvider theme={original}>
+				<MenuList>
+					<MenuListItem>🎤 Sing</MenuListItem>
+					<MenuListItem>💃🏻 Dance</MenuListItem>
+					<Separator />
+					<MenuListItem disabled>😴 Sleep</MenuListItem>
+				</MenuList>
+			</ThemeProvider>
+		</div>
+	</StoreContext.Provider>
 );
 
 export default App;
