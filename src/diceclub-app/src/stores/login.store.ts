@@ -17,13 +17,16 @@ class LoginStore {
 	checkAuthToken() {
 		var auth = localStorage.getItem("auth");
 		if (auth) {
+			this.token = JSON.parse(auth)
 		}
 	}
 	async login({ username, password }: { username: string; password: string }) {
-		const result =  await axios.post(`${apiConfig.baseURL}/api/v1/login/auth`, { username, password } as LoginRequestData);
-    
-    const loginResponse = result.data.json() as LoginResponseData;
-    if 
+		const result = await axios.post(`${apiConfig.baseURL}/api/v1/login/auth`, {
+			username,
+			password
+		} as LoginRequestData);
+
+		const loginResponse = result.data.json() as LoginResponseData;
 	}
 }
 
