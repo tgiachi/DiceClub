@@ -1,7 +1,10 @@
 ﻿using Aurora.Api.Entities.Context;
 using DiceClub.Database.Entities.Account;
+using DiceClub.Database.Entities.Cards;
+using DiceClub.Database.Entities.Cards.Deck;
 using DiceClub.Database.Entities.Inventory;
 using Microsoft.EntityFrameworkCore;
+using Mtg.Collection.Manager.Database.Entities;
 
 namespace DiceClub.Database.Context
 {
@@ -9,12 +12,24 @@ namespace DiceClub.Database.Context
     {
         public DbSet<DiceClubUser> Users { get; set; }
         public DbSet<DiceClubGroup> Groups { get; set; }
-
         public DbSet<UserGroup> UserGroups { get; set; }
-
         public DbSet<Inventory> Inventory { get; set; }
         public DbSet<InventoryCategory> InventoryCategories { get; set; }
         public DbSet<InventoryMovement> InventoryMovements { get; set; }
+
+
+        public DbSet<CardEntity> Cards { get; set; }
+        public DbSet<ColorEntity> Colors { get; set; }
+        public DbSet<CardTypeEntity> CardTypes { get; set; }
+
+        public DbSet<CreatureTypeEntity> CreatureTypes { get; set; }
+        public DbSet<RarityEntity> Rarities { get; set; }
+        public DbSet<ColorCardEntity> CardColors { get; set; }
+
+        public DbSet<DeckMasterEntity> DeckMaster { get; set; }
+
+        public DbSet<DeckDetailEntity> DeckDetails { get; set; }
+
         public DiceClubDbContext()
         {
 
