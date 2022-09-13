@@ -53,12 +53,8 @@ namespace DiceClub.Web
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                 };
             });
-
-
             await turbine.InitLogger(logConfig);
-
             
-
             turbine.ConfigureServices((builder, config) =>
             {
                 builder
@@ -73,8 +69,6 @@ namespace DiceClub.Web
 
             turbine.OnTurbineAppBuilt += application => 
             {
-                
-
                 application.UseDefaultFiles();
                 application.UseStaticFiles();
                 application.UseAuthentication();

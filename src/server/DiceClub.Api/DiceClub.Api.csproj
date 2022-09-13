@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Aurora.Api" Version="1.1.0" />
     <PackageReference Include="RandomStringCreator" Version="2.0.0" />
+    <PackageReference Include="MtgApiManager.Lib" Version="2.3.3" />
   </ItemGroup>
 
 </Project>

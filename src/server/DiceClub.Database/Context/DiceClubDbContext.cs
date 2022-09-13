@@ -25,10 +25,12 @@ namespace DiceClub.Database.Context
         public DbSet<CreatureTypeEntity> CreatureTypes { get; set; }
         public DbSet<RarityEntity> Rarities { get; set; }
         public DbSet<ColorCardEntity> CardColors { get; set; }
+        public DbSet<CardSetEntity> CardSets { get; set; }
 
         public DbSet<DeckMasterEntity> DeckMaster { get; set; }
-
         public DbSet<DeckDetailEntity> DeckDetails { get; set; }
+        
+        public DbSet<MtgEntity> MtgDump { get; set; }
 
         public DiceClubDbContext()
         {
@@ -38,6 +40,21 @@ namespace DiceClub.Database.Context
         public DiceClubDbContext(DbContextOptions options) : base(options)
         {
 
+        }
+
+        protected override void OnModelCreating(ModelBuilder model)
+        {
+            model.Entity<CardEntity>()
+                .HasGeneratedTsVectorColumn(p => p.SearchVector, "italian", p => new { p.CardName, p.Description })
+                .HasIndex(p => p.SearchVector)
+                .HasMethod("GIN");
+            
+            model.Entity<MtgEntity>()
+                .HasGeneratedTsVectorColumn(p => p.SearchVector, "italian", p => new { p.CardName, p.ForeignNames })
+                .HasIndex(p => p.SearchVector)
+                .HasMethod("GIN");
+                
+            base.OnModelCreating(model);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

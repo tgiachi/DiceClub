@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Aurora.Api.Entities.Impl.Entities;
 using DiceClub.Database.Entities.Account;
 using Mtg.Collection.Manager.Database.Entities;
+using NpgsqlTypes;
 
 namespace DiceClub.Database.Entities.Cards
 {
@@ -33,9 +35,18 @@ namespace DiceClub.Database.Entities.Cards
 
         public Guid? CreatureTypeId { get; set; }
         public virtual CreatureTypeEntity CreatureType { get; set; }
+        
+        public Guid CardSetId { get; set; }
+        
+        public virtual CardSetEntity CardSet { get; set; }
 
         public Guid UserId { get; set; }
 
         public DiceClubUser User { get; set; }
+        
+        public NpgsqlTsVector? SearchVector { get; set; }
+        
+        [MaxLength(3000)]
+        public string Description { get; set; }
     }
 }
