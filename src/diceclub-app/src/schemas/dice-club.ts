@@ -9,6 +9,124 @@
  * ---------------------------------------------------------------
  */
 
+export interface CardColorDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	name?: string | null;
+}
+
+export interface CardDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	cardName?: string | null;
+	manaCost?: string | null;
+
+	/** @format int32 */
+	totalManaCosts?: number;
+
+	/** @format int32 */
+	mtgId?: number | null;
+
+	/** @format double */
+	price?: number | null;
+
+	/** @format int32 */
+	quantity?: number;
+	imageUrl?: string | null;
+	colorCards?: CardColorDto[] | null;
+
+	/** @format uuid */
+	cardTypeId?: string;
+	cardType?: CardTypeDto;
+
+	/** @format uuid */
+	rarityId?: string;
+	rarity?: CardRarityDto;
+
+	/** @format uuid */
+	creatureTypeId?: string | null;
+	creatureType?: CardTypeDto;
+
+	/** @format uuid */
+	cardSetId?: string;
+	cardSet?: CardSetDto;
+
+	/** @format uuid */
+	userId?: string;
+	user?: DiceClubUserDto;
+	description?: string | null;
+}
+
+export interface CardDtoPaginationObject {
+	result?: CardDto[] | null;
+
+	/** @format int32 */
+	page?: number;
+
+	/** @format int32 */
+	size?: number;
+
+	/** @format int32 */
+	totalPages?: number;
+
+	/** @format int64 */
+	count?: number;
+}
+
+export interface CardQueryObject {
+	description?: string | null;
+	name?: string | null;
+}
+
+export interface CardRarityDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	name?: string | null;
+}
+
+export interface CardSetDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	setCode?: string | null;
+	description?: string | null;
+}
+
+export interface CardTypeDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	cardType?: string | null;
+}
+
 export interface DiceClubGroupDto {
 	/** @format uuid */
 	id?: string;
@@ -136,6 +254,45 @@ export interface LoginResponseData {
 }
 
 export namespace Api {
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardUploadFormatCardcastleCreate
+	 * @request POST:/api/v1/card/upload/format/cardcastle
+	 */
+	export namespace V1CardUploadFormatCardcastleCreate {
+		export type RequestParams = {};
+		export type RequestQuery = {};
+		export type RequestBody = { file?: File };
+		export type RequestHeaders = {};
+		export type ResponseBody = void;
+	}
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardImportMtgCreate
+	 * @request POST:/api/v1/card/import/mtg
+	 */
+	export namespace V1CardImportMtgCreate {
+		export type RequestParams = {};
+		export type RequestQuery = {};
+		export type RequestBody = never;
+		export type RequestHeaders = {};
+		export type ResponseBody = void;
+	}
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardSearchCreate
+	 * @request POST:/api/v1/card/search
+	 */
+	export namespace V1CardSearchCreate {
+		export type RequestParams = {};
+		export type RequestQuery = { pageNum?: number; pageSize?: number };
+		export type RequestBody = CardQueryObject;
+		export type RequestHeaders = {};
+		export type ResponseBody = CardDtoPaginationObject;
+	}
 	/**
 	 * No description
 	 * @tags Groups

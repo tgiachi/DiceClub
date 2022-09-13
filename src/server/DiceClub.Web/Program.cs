@@ -71,6 +71,14 @@ namespace DiceClub.Web
             {
                 application.UseDefaultFiles();
                 application.UseStaticFiles();
+                
+                application.UseCors(x => x
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .SetIsOriginAllowed(origin => true) // allow any origin
+                    .AllowCredentials()); // allow credentials
+
+                
                 application.UseAuthentication();
                 application.UseAuthorization();
                 

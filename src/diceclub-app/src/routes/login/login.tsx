@@ -1,39 +1,39 @@
 import { observer } from "mobx-react-lite";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Button, Col, Row } from "react-bootstrap";
+import { StoreContext, useStore } from "../../stores/store.context";
 import "./login.css";
-import { WindowHeader, Button, Toolbar, WindowContent, Panel, Window } from "react95";
 
 export const Login = observer(() => {
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [logged, setLogged] = useState(false);
+	const { loginStore } = useStore();
+
+	useEffect(() => {
+		setLogged(loginStore.isLogged);
+	}, [loginStore.isLogged]);
+
 	return (
 		<>
-			<Window resizable className="window">
-				<WindowHeader className="window-header">
-					<span>react95.exe</span>
-					<Button>
-						<span className="close-icon" />
+			<Row>
+				<Col>Logged: {logged}</Col>
+				<Col>
+					<input type="email" onChange={(e) => setEmail(e.target.value)} />
+				</Col>
+				<Col>
+					<input type="password" onChange={(e) => setPassword(e.target.value)} />
+				</Col>
+				<Col>
+					<Button
+						onClick={() => {
+							loginStore.login({ username: email, password: password });
+						}}
+					>
+						Login
 					</Button>
-				</WindowHeader>
-				<Toolbar>
-					<Button variant="menu" size="sm">
-						File
-					</Button>
-					<Button variant="menu" size="sm">
-						Edit
-					</Button>
-					<Button variant="menu" size="sm" disabled>
-						Save
-					</Button>
-				</Toolbar>
-				<WindowContent>
-					<p>
-						When you set &quot;resizable&quot; prop, there will be drag handle in the bottom right corner (but resizing
-						itself must be handled by you tho!)
-					</p>
-				</WindowContent>
-				<Panel variant="well" className="footer">
-					Put some useful informations here
-				</Panel>
-			</Window>
+				</Col>
+			</Row>
 		</>
 	);
 });

@@ -21,7 +21,7 @@ public class CardServicesModuleListener : Module
 
         builder.RegisterType<MtgServiceProvider>().AsSelf().SingleInstance();
         builder.RegisterType<ImportMtgService>().AsSelf().SingleInstance();
-        
+        builder.RegisterType<CardService>().AsSelf().SingleInstance();
         base.Load(builder);
     }
 }

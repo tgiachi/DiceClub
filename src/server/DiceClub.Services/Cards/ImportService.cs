@@ -136,7 +136,6 @@ namespace DiceClub.Services.Cards
                                     record.Name);
                                 return;
                             }
-                         
                         }
                     }
 
@@ -238,7 +237,7 @@ namespace DiceClub.Services.Cards
         {
             try
             {
-  var mana = TokenUtils.ExtractManaToken(card.ManaCost);
+                var mana = TokenUtils.ExtractManaToken(card.ManaCost);
                 var type = card.TypeLine.Split('—')[0].Trim();
 
                 Logger.LogInformation("{Name} - {ManaCost} - total: {Mana}", card.Name, card.ManaCost, mana);
@@ -251,7 +250,7 @@ namespace DiceClub.Services.Cards
                 else
                 {
                     var colors = new List<ColorEntity>();
-                    
+
                     if (card.Colors != null)
                     {
                         foreach (var color in card.Colors)
@@ -260,6 +259,7 @@ namespace DiceClub.Services.Cards
                                 entities.Where(s => s.Name == color)));
                         }
                     }
+
                     var cardType =
                         await _cardTypeDao.QueryAsSingle(entities => entities.Where(s => s.CardType == type));
                     var rarity = await _rarityDao.QueryAsSingle(entities => entities.Where(s => s.Name == card.Rarity));
@@ -278,6 +278,7 @@ namespace DiceClub.Services.Cards
                             imageLink = card.ImageUris["normal"].ToString();
                         }
                     }
+
                     var cardEntity = new CardEntity()
                     {
                         CardName = card.PrintedName ?? card.Name,

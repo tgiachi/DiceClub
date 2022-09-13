@@ -14,19 +14,30 @@ class LoginStore {
 		makeAutoObservable(this);
 	}
 
+	get isLogged() {
+		return this.logged;
+	}
+
+	@action
+	setLogged(value: boolean) {
+		this.logged = value;
+	}
+
 	checkAuthToken() {
 		var auth = localStorage.getItem("auth");
 		if (auth) {
-			this.token = JSON.parse(auth)
+			this.token = JSON.parse(auth);
 		}
 	}
 	async login({ username, password }: { username: string; password: string }) {
 		const result = await axios.post(`${apiConfig.baseURL}/api/v1/login/auth`, {
-			username,
+			email: username,
 			password
 		} as LoginRequestData);
 
-		const loginResponse = result.data.json() as LoginResponseData;
+		const loginResponse = result.data as LoginResponseData;
+		console.log(loginResponse);
+		this.logged = true;
 	}
 }
 
