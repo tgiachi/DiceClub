@@ -28,8 +28,7 @@ export const Login = observer(() => {
 					<Button
 						onClick={() => {
 							loginStore.login({ username: email, password: password });
-						}}
-					>
+						}}>
 						Login
 					</Button>
 				</Col>

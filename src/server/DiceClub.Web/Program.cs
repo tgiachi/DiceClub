@@ -64,9 +64,7 @@ namespace DiceClub.Web
                     .AddDtoMappers();
                 return builder;
             });
-
             
-
             turbine.OnTurbineAppBuilt += application => 
             {
                 application.UseDefaultFiles();

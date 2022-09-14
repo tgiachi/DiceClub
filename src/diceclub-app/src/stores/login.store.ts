@@ -18,8 +18,8 @@ class LoginStore {
 		return this.logged;
 	}
 
-	@action
-	setLogged(value: boolean) {
+
+	set setLogged(value: boolean) {
 		this.logged = value;
 	}
 
