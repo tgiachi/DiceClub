@@ -10,6 +10,7 @@
     "api-schema": "swagger-typescript-api -p http://localhost:5143/swagger/v1/swagger.json -o src/schemas/ -n dice-club.ts --route-types --no-client --enum-names-as-values"
   },
   "dependencies": {
+    "@microsoft/signalr": "^6.0.9",
     "@types/qs": "^6.9.7",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.1",

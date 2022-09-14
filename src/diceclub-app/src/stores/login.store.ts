@@ -38,6 +38,7 @@ class LoginStore {
 		// const { errorsStore } = useStore();
 
 		try {
+			this.rootStore.setIsLoading = true;
 			const result = await axios.post(`${apiConfig.baseURL}/api/v1/login/auth`, {
 				email: username,
 				password
@@ -53,6 +54,8 @@ class LoginStore {
 			}
 		} catch (e) {
 			this.rootStore.errorsStore.addError("Error during login", "error");
+
+			this.rootStore.setIsLoading = false;
 		}
 	}
 }

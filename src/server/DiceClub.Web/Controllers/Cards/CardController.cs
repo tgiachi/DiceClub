@@ -22,17 +22,27 @@ public class CardController : BaseAuthController
     private readonly CardService _cardService;
     private readonly IRestPaginatorService _restPaginatorService;
     private readonly CardDtoMapper _cardDtoMapper;
-    
+    private readonly CardSetDtoMapper _cardSetDtoMapper;
 
-    public CardController(ImportService importService, ImportMtgService importMtgService, CardService cardService, IRestPaginatorService restPaginatorService, CardDtoMapper cardDtoMapper)
+
+    public CardController(ImportService importService, ImportMtgService importMtgService, CardService cardService, IRestPaginatorService restPaginatorService, CardDtoMapper cardDtoMapper, CardSetDtoMapper cardSetDtoMapper)
     {
         _importService = importService;
         _importMtgService = importMtgService;
         _cardService = cardService;
         _restPaginatorService = restPaginatorService;
         _cardDtoMapper = cardDtoMapper;
+        _cardSetDtoMapper = cardSetDtoMapper;
     }
-    
+
+    [HttpGet]
+    [Route("sets/")]
+    public async Task<PaginationObject<CardSetDto>> GetAllSets(int page = 1, int pageSize = 30)
+    {
+        return await _restPaginatorService.Paginate<Guid, CardSetEntity, CardSetDto, CardSetDtoMapper>(
+            await _cardService.FindAllSets(), page, pageSize, _cardSetDtoMapper);
+    }
+
     [HttpPost]
     [Route("upload/format/cardcastle")]
     public async Task<IActionResult> UploadCardCastleCsv(IFormFile file)
@@ -53,7 +63,7 @@ public class CardController : BaseAuthController
         return Ok();
     }
 
-    
+
     [HttpPost]
     [Route("search/")]
     public async Task<PaginationObject<CardDto>> Search([FromBody] CardQueryObject query, [FromQuery] int pageNum = 1, [FromQuery] int pageSize = 50)

@@ -15,13 +15,22 @@ public class CardService : AbstractBaseService<CardService>
     private readonly CardsDao _cardsDao;
     private readonly ColorsDao _colorsDao;
     private readonly RarityDao _rarityDao;
+    private readonly CardSetDao _cardSetDao;
 
-    public CardService(IEventBusService eventBusService, ILogger<CardService> logger, CardsDao cardsDao, ColorsDao colorsDao, RarityDao rarityDao) : base(
+
+
+    public CardService(IEventBusService eventBusService, ILogger<CardService> logger, CardsDao cardsDao, ColorsDao colorsDao, RarityDao rarityDao, CardSetDao cardSetDao) : base(
         eventBusService, logger)
     {
         _cardsDao = cardsDao;
         _colorsDao = colorsDao;
         _rarityDao = rarityDao;
+        _cardSetDao = cardSetDao;
+    }
+
+    public Task<List<CardSetEntity>> FindAllSets()
+    {
+        return _cardSetDao.FindAll();
     }
 
     public async Task<List<CardEntity>> SearchCards(CardQueryObject query)
@@ -54,7 +63,6 @@ public class CardService : AbstractBaseService<CardService>
 
             }
         }
-
 
         return await _cardsDao.QueryAsList(entities =>
         {
