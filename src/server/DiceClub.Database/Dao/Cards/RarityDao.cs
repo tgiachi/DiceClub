@@ -15,6 +15,11 @@ namespace DiceClub.Database.Dao.Cards
         {
         }
 
+        public Task<RarityEntity> FindByName(string name)
+        {
+            return QueryAsSingle(entities => entities.Where(s => s.Name.ToLower() == name.ToLower()));
+        }
+
         public async Task<RarityEntity> AddCardTypeIfNotExists(string type)
         {
             var exists = await QueryAsSingle(entities => entities.Where(s => s.Name == type));

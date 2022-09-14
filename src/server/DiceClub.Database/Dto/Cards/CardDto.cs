@@ -18,7 +18,7 @@ public class CardDto : AbstractGuidDtoEntity
 
     public string ImageUrl { get; set; }
 
-    public virtual List<CardColorDto> ColorCards { get; set; }
+    //public virtual List<CardColorDto> ColorCards { get; set; }
     public Guid CardTypeId { get; set; }
     public virtual CardTypeDto CardType { get; set; }
 
@@ -28,15 +28,15 @@ public class CardDto : AbstractGuidDtoEntity
 
     public Guid? CreatureTypeId { get; set; }
     public virtual CardTypeDto CreatureType { get; set; }
-        
+
     public Guid CardSetId { get; set; }
-        
+
     public virtual CardSetDto CardSet { get; set; }
 
     public Guid UserId { get; set; }
 
     public DiceClubUserDto User { get; set; }
-    
+
     public string Description { get; set; }
-    
+
 }

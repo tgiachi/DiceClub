@@ -284,7 +284,7 @@ namespace DiceClub.Services.Cards
                         CardName = card.PrintedName ?? card.Name,
                         // Colors = colors,
                         CardTypeId = cardType.Id,
-                        ManaCost = card.ManaCost,
+                        ManaCost = card.ManaCost ?? " ",
                         TotalManaCosts = mana,
                         Quantity = 1,
                         ImageUrl = imageLink,
@@ -295,6 +295,7 @@ namespace DiceClub.Services.Cards
                         Description = card.PrintedText ?? card.OracleText ?? "",
                         CardSetId = setId.Id,
                     };
+
                     await _cardsDao.Insert(cardEntity);
 
                     foreach (var color in colors)

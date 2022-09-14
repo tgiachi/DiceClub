@@ -1,12 +1,15 @@
 import { createContext, useContext } from "react";
+import { ApiClientStore } from "./api.store";
+import ErrorStore from "./errors.store";
 import LoginStore from "./login.store";
+import { RootStore } from "./root.store";
 
 interface IStoresContext {
-	loginStore: LoginStore;
+	rootStore: RootStore;
 }
 
 const initialValues: IStoresContext = {
-	loginStore: new LoginStore()
+	rootStore: new RootStore()
 };
 
 const StoreContext = createContext<IStoresContext>(initialValues);
@@ -17,6 +20,6 @@ const useStore = () => {
 		throw new Error("useStore must be used within a StoreProvider");
 	}
 	return store;
-}
+};
 
 export { StoreContext, initialValues, useStore };

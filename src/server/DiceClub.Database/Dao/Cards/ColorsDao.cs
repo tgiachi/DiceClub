@@ -11,14 +11,15 @@ namespace DiceClub.Database.Dao.Cards
 
     public class ColorsDao : AbstractDataAccess<Guid, ColorEntity, DiceClubDbContext>
     {
-       
+
 
         public async Task<ColorEntity> AddIfNotExists(string color)
         {
             var colorEntity = await QueryAsSingle(s => s.Where(k => k.Name == color));
             if (colorEntity == null)
             {
-                colorEntity = new ColorEntity() {
+                colorEntity = new ColorEntity()
+                {
                     Name = color
                 };
                 await Insert(colorEntity);
@@ -27,6 +28,10 @@ namespace DiceClub.Database.Dao.Cards
             return colorEntity;
         }
 
+        public Task<ColorEntity> FindByName(string name)
+        {
+            return QueryAsSingle(entities => entities.Where(s => s.Name.ToLower() == name.ToLower()));
+        }
         public ColorsDao(IDbContextFactory<DiceClubDbContext> dbContext, ILogger<ColorEntity> logger) : base(dbContext, logger)
         {
         }

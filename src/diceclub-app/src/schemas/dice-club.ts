@@ -9,18 +9,6 @@
  * ---------------------------------------------------------------
  */
 
-export interface CardColorDto {
-	/** @format uuid */
-	id?: string;
-
-	/** @format date-time */
-	created?: string;
-
-	/** @format date-time */
-	updated?: string;
-	name?: string | null;
-}
-
 export interface CardDto {
 	/** @format uuid */
 	id?: string;
@@ -45,7 +33,6 @@ export interface CardDto {
 	/** @format int32 */
 	quantity?: number;
 	imageUrl?: string | null;
-	colorCards?: CardColorDto[] | null;
 
 	/** @format uuid */
 	cardTypeId?: string;
@@ -88,6 +75,8 @@ export interface CardDtoPaginationObject {
 export interface CardQueryObject {
 	description?: string | null;
 	name?: string | null;
+	colors?: string[] | null;
+	rarity?: string[] | null;
 }
 
 export interface CardRarityDto {
