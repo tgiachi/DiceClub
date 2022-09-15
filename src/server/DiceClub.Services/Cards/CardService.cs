@@ -16,21 +16,49 @@ public class CardService : AbstractBaseService<CardService>
     private readonly ColorsDao _colorsDao;
     private readonly RarityDao _rarityDao;
     private readonly CardSetDao _cardSetDao;
+    private readonly CardLegalityDao _cardLegalityDao;
+    private readonly CardLegalityTypeDao _cardLegalityTypeDao;
+    private readonly CardTypeDao _cardTypeDao;
+    private readonly CreatureTypeDao _creatureTypeDao;
 
 
 
-    public CardService(IEventBusService eventBusService, ILogger<CardService> logger, CardsDao cardsDao, ColorsDao colorsDao, RarityDao rarityDao, CardSetDao cardSetDao) : base(
+    public CardService(IEventBusService eventBusService, ILogger<CardService> logger, CardsDao cardsDao, ColorsDao colorsDao, RarityDao rarityDao, CardSetDao cardSetDao, CardLegalityDao cardLegalityDao, CardLegalityTypeDao cardLegalityTypeDao, CardTypeDao cardTypeDao, CreatureTypeDao creatureTypeDao) : base(
         eventBusService, logger)
     {
         _cardsDao = cardsDao;
         _colorsDao = colorsDao;
         _rarityDao = rarityDao;
         _cardSetDao = cardSetDao;
+        _cardLegalityDao = cardLegalityDao;
+        _cardLegalityTypeDao = cardLegalityTypeDao;
+        _cardTypeDao = cardTypeDao;
+        _creatureTypeDao = creatureTypeDao;
     }
 
     public Task<List<CardSetEntity>> FindAllSets()
     {
         return _cardSetDao.FindAll();
+    }
+
+    public Task<List<CardLegalityEntity>> FindAllLegalities()
+    {
+        return _cardLegalityDao.FindAll();
+    }
+
+    public Task<List<CardLegalityTypeEntity>> FindAllLegalityTypes()
+    {
+        return _cardLegalityTypeDao.FindAll();
+    }
+
+    public Task<List<CreatureTypeEntity>> FindAllCreatureTypes()
+    {
+        return _creatureTypeDao.FindAll();
+    }
+
+    public Task<List<CardTypeEntity>> FindAllCardTypes()
+    {
+        return _cardTypeDao.FindAll();
     }
 
     public async Task<List<CardEntity>> SearchCards(CardQueryObject query)
@@ -60,7 +88,6 @@ public class CardService : AbstractBaseService<CardService>
                 {
                     raririesGuids.Add(rarity.Id);
                 }
-
             }
         }
 

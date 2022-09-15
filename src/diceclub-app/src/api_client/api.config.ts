@@ -3,13 +3,5 @@ export const apiConfig = {
 	withCredentials: true,
 	timeout: 30000,
 	baseURL: `${import.meta.env.BASE_API_URL || "http://localhost:5143"}`,
-	headers: {
-		common: {
-			"Cache-Control": "no-cache, no-store, must-revalidate",
-			Pragma: "no-cache",
-			"Content-Type": "application/json",
-			Accept: "application/json",
-			"Access-Control-Allow-Origin": "*"
-		}
-	}
+	defaultPageSize: 30
 };

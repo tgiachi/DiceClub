@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Aurora.Api.Entities.Impl.Entities;
 
-
-namespace Mtg.Collection.Manager.Database.Entities
+namespace DiceClub.Database.Entities.Cards
 {
 
     [Table("rarity")]

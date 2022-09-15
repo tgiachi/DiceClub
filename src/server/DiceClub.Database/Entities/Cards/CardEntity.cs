@@ -15,17 +15,23 @@ namespace DiceClub.Database.Entities.Cards
 
         public string ManaCost { get; set; }
 
+        public int CollectionNumber { get; set; } 
         public int TotalManaCosts { get; set; }
 
         public int? MtgId { get; set; }
 
         public decimal? Price { get; set; }
 
+        
+        [MaxLength(150)]
+        public string TypeLine { get; set; }
         public int Quantity { get; set; }
 
         public string ImageUrl { get; set; }
 
         public virtual List<ColorCardEntity> ColorCards { get; set; }
+        
+        public virtual List<CardCardLegality> CardLegalities { get; set; }
         public Guid CardTypeId { get; set; }
         public virtual CardTypeEntity CardType { get; set; }
 
@@ -48,5 +54,9 @@ namespace DiceClub.Database.Entities.Cards
         
         [MaxLength(3000)]
         public string Description { get; set; }
+        
+        public bool IsColorLess { get; set; }
+        
+        public bool IlMultiColor { get; set; }
     }
 }

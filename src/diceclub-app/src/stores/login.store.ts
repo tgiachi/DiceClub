@@ -46,6 +46,7 @@ class LoginStore {
 			const loginResponse = result.data as LoginResponseData;
 
 			if (loginResponse.accessToken && loginResponse.refreshToken && loginResponse.accessTokenExpire) {
+				this.rootStore.setIsLoading = false;
 				this.rootStore.apiStore.setAuthenticated(
 					loginResponse.accessToken,
 					loginResponse.refreshToken,

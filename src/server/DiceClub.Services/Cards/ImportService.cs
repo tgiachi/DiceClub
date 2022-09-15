@@ -29,6 +29,11 @@ namespace DiceClub.Services.Cards
         private readonly RarityDao _rarityDao;
         private readonly CardsDao _cardsDao;
         private readonly CardSetDao _cardSetDao;
+        private readonly CardLegalityDao _cardLegalityDao;
+        private readonly CardLegalityTypeDao _cardLegalityTypeDao;
+        private readonly CardCardLegalityDao _cardCardLegalityDao;
+        private readonly CreatureTypeDao _creatureTypeDao;
+
         private readonly ImportMtgService _importMtgService;
 
 
@@ -41,8 +46,8 @@ namespace DiceClub.Services.Cards
             RarityDao rarityDao,
             CardsDao cardsDao,
             CardSetDao cardSetDao,
-            ImportMtgService importMtgService
-        ) : base(eventBusService, logger)
+            CardLegalityDao cardLegalityDao,
+            ImportMtgService importMtgService, CardLegalityTypeDao cardLegalityTypeDao, CardCardLegalityDao cardCardLegalityDao, CreatureTypeDao creatureTypeDao) : base(eventBusService, logger)
         {
             _scryfallApiClient = scryfallApiClient;
             _colorCardDao = colorCardDao;
@@ -52,6 +57,10 @@ namespace DiceClub.Services.Cards
             _cardsDao = cardsDao;
             _cardSetDao = cardSetDao;
             _importMtgService = importMtgService;
+            _cardLegalityTypeDao = cardLegalityTypeDao;
+            _cardCardLegalityDao = cardCardLegalityDao;
+            _creatureTypeDao = creatureTypeDao;
+            _cardLegalityDao = cardLegalityDao;
         }
 
         public async Task ImportCardCastleCsv(string fileName, Guid clubUserId)
@@ -61,8 +70,10 @@ namespace DiceClub.Services.Cards
 
             await ImportColors(cards);
             await ImportCardTypes(cards);
+            await ImportCreatureTypes(cards);
             await ImportRarities(cards);
             await ImportSets(cards);
+            await ImportLegalities(cards);
             await AddCards(cards, clubUserId);
         }
 
@@ -127,14 +138,28 @@ namespace DiceClub.Services.Cards
                             await _scryfallApiClient.Cards.Search(record.Name, 1, SearchOptions.CardSort.Name);
                         if (fallBackCards.Data.Count > 0)
                         {
-                            var fallBackCard =
-                                fallBackCards.Data.FirstOrDefault(card => card.Id == Guid.Parse(record.JsonId));
-                            if (fallBackCard != null)
+                            try
                             {
-                                cards.Add(fallBackCard);
-                                Logger.LogInformation("Added fallback card {Card} - {CardName}", fallBackCard.Name,
-                                    record.Name);
-                                return;
+                                var fallBackCard =
+                                    fallBackCards.Data.FirstOrDefault(card => card.Id == Guid.Parse(record.JsonId));
+
+                                if (fallBackCard != null)
+                                {
+                                    cards.Add(fallBackCard);
+                                    Logger.LogInformation("Added fallback card {Card} - {CardName}", fallBackCard.Name,
+                                        record.Name);
+                                    return;
+                                }
+                            }
+                            catch
+                            {
+                                var guidErrorCard = fallBackCards.Data.FirstOrDefault(s => s.Name == record.Name);
+                                if (guidErrorCard != null)
+                                {
+                                    cards.Add(guidErrorCard);
+                                    Logger.LogInformation("Added fallback card {Card} - {CardName}", guidErrorCard.Name,
+                                        record.Name);
+                                }
                             }
                         }
                     }
@@ -186,13 +211,44 @@ namespace DiceClub.Services.Cards
             return cards.ToList();
         }
 
+        public async Task ImportLegalities(List<Card> cards)
+        {
+            var legalities = cards.SelectMany(s => s.Legalities).DistinctBy(s => s.Key).Select(s => s.Key).ToList();
+            var legalitiesTypes = cards.SelectMany(s => s.Legalities).DistinctBy(s => s.Value).Select(s => s.Value).ToList();
+
+
+            foreach (var cl in legalities)
+            {
+                await _cardLegalityDao.CreateIfNotExists(cl);
+            }
+
+            foreach (var legalitiesType in legalitiesTypes)
+            {
+                await _cardLegalityTypeDao.CreateIfNotExists(legalitiesType);
+            }
+            
+        }
+
+        public async Task ImportCreatureTypes(List<Card> cards)
+        {
+            var creaturesTypes = cards.Where(s => s.TypeLine.ToLower().StartsWith("creature"))
+                .Select(s => s.TypeLine.Split('—')[1].Trim()).ToList();
+
+
+            foreach (var creatureType in creaturesTypes)
+            {
+                await _creatureTypeDao.AddIfNotExists(creatureType);
+            }
+            
+        }
+
         public async Task ImportSets(List<Card> cards)
         {
-            var sets = cards.DistinctBy(s => s.Set).Select(s => new { s.Set, s.SetName }).ToList();
-
-            foreach (var set in sets)
+            var sets = await _scryfallApiClient.Sets.Get();
+            
+            foreach (var set in sets.Data)
             {
-                await _cardSetDao.CreateIfNotExists(set.Set, set.SetName);
+                await _cardSetDao.CreateIfNotExists(set.Code, set.Name, set.IconSvgUri.ToString());
             }
         }
 
@@ -233,14 +289,14 @@ namespace DiceClub.Services.Cards
             }
         }
 
-        private async Task AddCard(Card card, Guid userId)
+        private async Task AddCard(Card card, Guid userId, int index)
         {
             try
             {
                 var mana = TokenUtils.ExtractManaToken(card.ManaCost);
                 var type = card.TypeLine.Split('—')[0].Trim();
 
-                Logger.LogInformation("{Name} - {ManaCost} - total: {Mana}", card.Name, card.ManaCost, mana);
+         
                 var exists = await _cardsDao.CheckIfCardExists(card.Name);
 
                 if (exists)
@@ -278,7 +334,7 @@ namespace DiceClub.Services.Cards
                             imageLink = card.ImageUris["normal"].ToString();
                         }
                     }
-
+                    
                     var cardEntity = new CardEntity()
                     {
                         CardName = card.PrintedName ?? card.Name,
@@ -288,16 +344,41 @@ namespace DiceClub.Services.Cards
                         TotalManaCosts = mana,
                         Quantity = 1,
                         ImageUrl = imageLink,
+                        TypeLine = card.TypeLine ?? " ",
                         Price = card.Prices.Eur,
                         MtgId = card.MtgoId,
                         RarityId = rarity.Id,
                         UserId = userId,
                         Description = card.PrintedText ?? card.OracleText ?? "",
                         CardSetId = setId.Id,
+                        IsColorLess = colors.Count == 0,
+                        IlMultiColor = colors.Count > 1
                     };
-
+                    
+                    if (!string.IsNullOrEmpty(card.CollectorNumber))
+                    {
+                        try
+                        {
+                            var cn = int.Parse(card.CollectorNumber);
+                            cardEntity.CollectionNumber = cn;
+                        }
+                        catch
+                        {
+                            
+                        }
+                    }
+                     
+                    if (!string.IsNullOrEmpty(card.TypeLine))
+                    {
+                        if (card.TypeLine.ToLower().StartsWith("creature"))
+                        {
+                            var creatureTypeStr = card.TypeLine.Split('—')[1].Trim();
+                            var creatureType = await _creatureTypeDao.FindByName(creatureTypeStr);
+                            cardEntity.CreatureTypeId = creatureType.Id;
+                        }   
+                    }
                     await _cardsDao.Insert(cardEntity);
-
+                    
                     foreach (var color in colors)
                     {
                         await _colorCardDao.Insert(new ColorCardEntity()
@@ -306,6 +387,24 @@ namespace DiceClub.Services.Cards
                             ColorId = color.Id,
                         });
                     }
+
+                    if (card.Legalities != null)
+                    {
+                        foreach (var legality in card.Legalities)
+                        {
+                            var legalityName = await _cardLegalityDao.FindByName(legality.Key);
+                            var legalityType = await _cardLegalityTypeDao.FindByName(legality.Value);
+
+                            await _cardCardLegalityDao.Insert(new CardCardLegality()
+                            {
+                                CardId = cardEntity.Id,
+                                CardLegalityId = legalityName.Id,
+                                CardLegalityTypeId = legalityType.Id
+                            });
+                        }
+                    }
+                    
+                    Logger.LogInformation("{Name} - {ManaCost} - total: {Mana} - [{Index}]", card.Name, card.ManaCost, mana, index);
                 }
             }
             catch (Exception ex)
@@ -316,10 +415,10 @@ namespace DiceClub.Services.Cards
 
         public async Task AddCards(List<Card> cards, Guid userId)
         {
-            foreach (var card in cards)
+            await cards.ParallelForEachAsync(async (card, index) =>
             {
-                await AddCard(card, userId);
-            }
+                await AddCard(card, userId, (int)index);
+            }, 30);
         }
     }
 }

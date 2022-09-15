@@ -72,6 +72,30 @@ export interface CardDtoPaginationObject {
 	count?: number;
 }
 
+export interface CardLegalityDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	name?: string | null;
+}
+
+export interface CardLegalityTypeDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	name?: string | null;
+}
+
 export interface CardQueryObject {
 	description?: string | null;
 	name?: string | null;
@@ -102,6 +126,23 @@ export interface CardSetDto {
 	updated?: string;
 	setCode?: string | null;
 	description?: string | null;
+	image?: string | null;
+}
+
+export interface CardSetDtoPaginationObject {
+	result?: CardSetDto[] | null;
+
+	/** @format int32 */
+	page?: number;
+
+	/** @format int32 */
+	size?: number;
+
+	/** @format int32 */
+	totalPages?: number;
+
+	/** @format int64 */
+	count?: number;
 }
 
 export interface CardTypeDto {
@@ -114,6 +155,18 @@ export interface CardTypeDto {
 	/** @format date-time */
 	updated?: string;
 	cardType?: string | null;
+}
+
+export interface CreatureTypeDto {
+	/** @format uuid */
+	id?: string;
+
+	/** @format date-time */
+	created?: string;
+
+	/** @format date-time */
+	updated?: string;
+	name?: string | null;
 }
 
 export interface DiceClubGroupDto {
@@ -243,6 +296,71 @@ export interface LoginResponseData {
 }
 
 export namespace Api {
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardSetsList
+	 * @request GET:/api/v1/card/sets
+	 */
+	export namespace V1CardSetsList {
+		export type RequestParams = {};
+		export type RequestQuery = { page?: number; pageSize?: number };
+		export type RequestBody = never;
+		export type RequestHeaders = {};
+		export type ResponseBody = CardSetDtoPaginationObject;
+	}
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardCreaturesTypesList
+	 * @request GET:/api/v1/card/creatures/types
+	 */
+	export namespace V1CardCreaturesTypesList {
+		export type RequestParams = {};
+		export type RequestQuery = {};
+		export type RequestBody = never;
+		export type RequestHeaders = {};
+		export type ResponseBody = CreatureTypeDto[];
+	}
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardTypesList
+	 * @request GET:/api/v1/card/types
+	 */
+	export namespace V1CardTypesList {
+		export type RequestParams = {};
+		export type RequestQuery = {};
+		export type RequestBody = never;
+		export type RequestHeaders = {};
+		export type ResponseBody = CardTypeDto[];
+	}
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardLegalitiesList
+	 * @request GET:/api/v1/card/legalities
+	 */
+	export namespace V1CardLegalitiesList {
+		export type RequestParams = {};
+		export type RequestQuery = {};
+		export type RequestBody = never;
+		export type RequestHeaders = {};
+		export type ResponseBody = CardLegalityDto[];
+	}
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardLegalitiesTypesList
+	 * @request GET:/api/v1/card/legalities/types
+	 */
+	export namespace V1CardLegalitiesTypesList {
+		export type RequestParams = {};
+		export type RequestQuery = {};
+		export type RequestBody = never;
+		export type RequestHeaders = {};
+		export type ResponseBody = CardLegalityTypeDto[];
+	}
 	/**
 	 * No description
 	 * @tags Card

@@ -2,6 +2,7 @@
 using Aurora.Api.Entities.Impl.Seeds;
 using Aurora.Api.Entities.Interfaces.Dao;
 using DiceClub.Database.Dao.Cards;
+using DiceClub.Database.Entities.Cards;
 using Microsoft.Extensions.Logging;
 using Mtg.Collection.Manager.Database.Entities;
 using ScryfallApi.Client;
@@ -26,7 +27,7 @@ public class CardsSeed : AbstractDbSeed<Guid, ColorCardEntity>
 
         foreach (var set in sets.Data)
         {
-            await _cardSetDao.CreateIfNotExists(set.Code, set.Name);
+            await _cardSetDao.CreateIfNotExists(set.Code, set.Name, set.IconSvgUri != null ? set.IconSvgUri.ToString() : " ");
         }
 
         return true;

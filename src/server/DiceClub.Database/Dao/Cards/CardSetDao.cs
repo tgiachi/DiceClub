@@ -17,7 +17,7 @@ public class CardSetDao : AbstractDataAccess<Guid, CardSetEntity, DiceClubDbCont
         
     }
 
-    public async Task<CardSetEntity> CreateIfNotExists(string setCode, string description)
+    public async Task<CardSetEntity> CreateIfNotExists(string setCode, string description, string image)
     {
         var cardSet = await QueryAsSingle(entities => entities.Where(s => s.SetCode == setCode));
         if (cardSet == null)
@@ -25,7 +25,8 @@ public class CardSetDao : AbstractDataAccess<Guid, CardSetEntity, DiceClubDbCont
             cardSet = new CardSetEntity
             {
                 SetCode = setCode,
-                Description = description
+                Description = description,
+                Image = image
             };
 
             return await Insert(cardSet);

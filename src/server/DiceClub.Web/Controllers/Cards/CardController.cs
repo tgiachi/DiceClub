@@ -1,5 +1,6 @@
 ﻿using Aurora.Turbine.Api.Data.Pagination;
 using Aurora.Turbine.Api.Interfaces;
+using DiceClub.Database.Dao.Cards;
 using DiceClub.Database.Dto.Cards;
 using DiceClub.Database.Dto.Cards.Mappers;
 using DiceClub.Database.Entities.Cards;
@@ -23,9 +24,14 @@ public class CardController : BaseAuthController
     private readonly IRestPaginatorService _restPaginatorService;
     private readonly CardDtoMapper _cardDtoMapper;
     private readonly CardSetDtoMapper _cardSetDtoMapper;
+    private readonly CardLegalityDtoMapper _cardLegalityDtoMapper;
+    private readonly CardLegalityTypeMapper _cardLegalityTypeMapper;
+    private readonly CardCreatureTypeDtoMapper _cardCreatureTypeDtoMapper;
+    private readonly CardTypeDtoMapper _cardTypeDtoMapper;
+    
 
 
-    public CardController(ImportService importService, ImportMtgService importMtgService, CardService cardService, IRestPaginatorService restPaginatorService, CardDtoMapper cardDtoMapper, CardSetDtoMapper cardSetDtoMapper)
+    public CardController(ImportService importService, ImportMtgService importMtgService, CardService cardService, IRestPaginatorService restPaginatorService, CardDtoMapper cardDtoMapper, CardSetDtoMapper cardSetDtoMapper, CardLegalityDtoMapper cardLegalityDtoMapper, CardLegalityTypeMapper cardLegalityTypeMapper, CardCreatureTypeDtoMapper cardCreatureTypeDtoMapper, CardTypeDtoMapper cardTypeDtoMapper)
     {
         _importService = importService;
         _importMtgService = importMtgService;
@@ -33,6 +39,10 @@ public class CardController : BaseAuthController
         _restPaginatorService = restPaginatorService;
         _cardDtoMapper = cardDtoMapper;
         _cardSetDtoMapper = cardSetDtoMapper;
+        _cardLegalityDtoMapper = cardLegalityDtoMapper;
+        _cardLegalityTypeMapper = cardLegalityTypeMapper;
+        _cardCreatureTypeDtoMapper = cardCreatureTypeDtoMapper;
+        _cardTypeDtoMapper = cardTypeDtoMapper;
     }
 
     [HttpGet]
@@ -41,6 +51,35 @@ public class CardController : BaseAuthController
     {
         return await _restPaginatorService.Paginate<Guid, CardSetEntity, CardSetDto, CardSetDtoMapper>(
             await _cardService.FindAllSets(), page, pageSize, _cardSetDtoMapper);
+    }
+    
+    [HttpGet]
+    [Route("creatures/types")]
+    public async Task<List<CreatureTypeDto>> GetCreatureTypes()
+    {
+        return  _cardCreatureTypeDtoMapper.ToDto(await _cardService.FindAllCreatureTypes());
+    }
+    
+    [HttpGet]
+    [Route("types")]
+    public async Task<List<CardTypeDto>> GetCardTypes()
+    {
+        return _cardTypeDtoMapper.ToDto(await _cardService.FindAllCardTypes());
+    }
+
+    
+    [HttpGet]
+    [Route("legalities")]
+    public async Task<List<CardLegalityDto>> GetAllCartLegalities()
+    {
+        return  _cardLegalityDtoMapper.ToDto(await _cardService.FindAllLegalities());
+    }
+    
+    [HttpGet]
+    [Route("legalities/types")]
+    public async Task<List<CardLegalityTypeDto>> GetAllCartLegalitiesType()
+    {
+        return  _cardLegalityTypeMapper.ToDto(await _cardService.FindAllLegalityTypes());
     }
 
     [HttpPost]

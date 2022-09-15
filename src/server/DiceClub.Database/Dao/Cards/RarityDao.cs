@@ -1,6 +1,7 @@
 ﻿using Aurora.Api.Attributes;
 using Aurora.Api.Entities.Impl.Dao;
 using DiceClub.Database.Context;
+using DiceClub.Database.Entities.Cards;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mtg.Collection.Manager.Database.Entities;

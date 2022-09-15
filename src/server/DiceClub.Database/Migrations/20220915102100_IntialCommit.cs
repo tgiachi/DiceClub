@@ -7,10 +7,38 @@ using NpgsqlTypes;
 
 namespace DiceClub.Database.Migrations
 {
-    public partial class IntialMigration : Migration
+    public partial class IntialCommit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "card_lagality_types",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    created_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_card_lagality_types", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "card_legalities",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    created_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_card_legalities", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "card_sets",
                 columns: table => new
@@ -174,9 +202,11 @@ namespace DiceClub.Database.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     card_name = table.Column<string>(type: "text", nullable: false),
                     mana_cost = table.Column<string>(type: "text", nullable: false),
+                    collection_number = table.Column<int>(type: "integer", nullable: false),
                     total_mana_costs = table.Column<int>(type: "integer", nullable: false),
                     mtg_id = table.Column<int>(type: "integer", nullable: true),
                     price = table.Column<decimal>(type: "numeric", nullable: true),
+                    type_line = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     quantity = table.Column<int>(type: "integer", nullable: false),
                     image_url = table.Column<string>(type: "text", nullable: false),
                     card_type_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -186,8 +216,10 @@ namespace DiceClub.Database.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     search_vector = table.Column<NpgsqlTsVector>(type: "tsvector", nullable: true)
                         .Annotation("Npgsql:TsVectorConfig", "italian")
-                        .Annotation("Npgsql:TsVectorProperties", new[] { "card_name", "description" }),
+                        .Annotation("Npgsql:TsVectorProperties", new[] { "card_name", "description", "type_line" }),
                     description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
+                    is_color_less = table.Column<bool>(type: "boolean", nullable: false),
+                    il_multi_color = table.Column<bool>(type: "boolean", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     updated_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -284,6 +316,40 @@ namespace DiceClub.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "card_card_legality",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    card_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    card_legality_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    card_legality_type_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_card_card_legality", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_card_card_legality_card_lagality_types_card_legality_type_id",
+                        column: x => x.card_legality_type_id,
+                        principalTable: "card_lagality_types",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_card_card_legality_card_legalities_card_legality_id",
+                        column: x => x.card_legality_id,
+                        principalTable: "card_legalities",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_card_card_legality_cards_card_id",
+                        column: x => x.card_id,
+                        principalTable: "cards",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "color_card",
                 columns: table => new
                 {
@@ -374,6 +440,21 @@ namespace DiceClub.Database.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_card_card_legality_card_id",
+                table: "card_card_legality",
+                column: "card_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_card_card_legality_card_legality_id",
+                table: "card_card_legality",
+                column: "card_legality_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_card_card_legality_card_legality_type_id",
+                table: "card_card_legality",
+                column: "card_legality_type_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_cards_card_set_id",
@@ -477,6 +558,9 @@ namespace DiceClub.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "card_card_legality");
+
+            migrationBuilder.DropTable(
                 name: "color_card");
 
             migrationBuilder.DropTable(
@@ -490,6 +574,12 @@ namespace DiceClub.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_groups");
+
+            migrationBuilder.DropTable(
+                name: "card_lagality_types");
+
+            migrationBuilder.DropTable(
+                name: "card_legalities");
 
             migrationBuilder.DropTable(
                 name: "colors");

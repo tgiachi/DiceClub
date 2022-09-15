@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Aurora.Api.Entities.Impl.Entities;
-using DiceClub.Database.Entities.Cards;
+using Mtg.Collection.Manager.Database.Entities;
 
-
-namespace Mtg.Collection.Manager.Database.Entities
+namespace DiceClub.Database.Entities.Cards
 {
 
     [Table("color_card")]

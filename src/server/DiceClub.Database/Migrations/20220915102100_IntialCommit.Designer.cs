@@ -14,8 +14,8 @@ using NpgsqlTypes;
 namespace DiceClub.Database.Migrations
 {
     [DbContext(typeof(DiceClubDbContext))]
-    [Migration("20220912163118_IntialMigration")]
-    partial class IntialMigration
+    [Migration("20220915102100_IntialCommit")]
+    partial class IntialCommit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -159,6 +159,48 @@ namespace DiceClub.Database.Migrations
                     b.ToTable("user_groups", (string)null);
                 });
 
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardCardLegality", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CardId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("card_id");
+
+                    b.Property<Guid>("CardLegalityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("card_legality_id");
+
+                    b.Property<Guid>("CardLegalityTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("card_legality_type_id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_card_card_legality");
+
+                    b.HasIndex("CardId")
+                        .HasDatabaseName("ix_card_card_legality_card_id");
+
+                    b.HasIndex("CardLegalityId")
+                        .HasDatabaseName("ix_card_card_legality_card_legality_id");
+
+                    b.HasIndex("CardLegalityTypeId")
+                        .HasDatabaseName("ix_card_card_legality_card_legality_type_id");
+
+                    b.ToTable("card_card_legality", (string)null);
+                });
+
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -179,6 +221,10 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("card_type_id");
 
+                    b.Property<int>("CollectionNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("collection_number");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_date");
@@ -193,10 +239,18 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("character varying(3000)")
                         .HasColumnName("description");
 
+                    b.Property<bool>("IlMultiColor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("il_multi_color");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("image_url");
+
+                    b.Property<bool>("IsColorLess")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_color_less");
 
                     b.Property<string>("ManaCost")
                         .IsRequired()
@@ -224,11 +278,17 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("tsvector")
                         .HasColumnName("search_vector")
                         .HasAnnotation("Npgsql:TsVectorConfig", "italian")
-                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "CardName", "Description" });
+                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "CardName", "Description", "TypeLine" });
 
                     b.Property<int>("TotalManaCosts")
                         .HasColumnType("integer")
                         .HasColumnName("total_mana_costs");
+
+                    b.Property<string>("TypeLine")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("type_line");
 
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp without time zone")
@@ -264,6 +324,58 @@ namespace DiceClub.Database.Migrations
                     b.ToTable("cards", (string)null);
                 });
 
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardLegalityEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_card_legalities");
+
+                    b.ToTable("card_legalities", (string)null);
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardLegalityTypeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_card_lagality_types");
+
+                    b.ToTable("card_lagality_types", (string)null);
+                });
+
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardSetEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -294,6 +406,93 @@ namespace DiceClub.Database.Migrations
                         .HasName("pk_card_sets");
 
                     b.ToTable("card_sets", (string)null);
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardTypeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CardType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("card_type");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_card_types");
+
+                    b.ToTable("card_types", (string)null);
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.ColorCardEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CardId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("card_id");
+
+                    b.Property<Guid>("ColorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("color_id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_color_card");
+
+                    b.HasIndex("CardId")
+                        .HasDatabaseName("ix_color_card_card_id");
+
+                    b.HasIndex("ColorId")
+                        .HasDatabaseName("ix_color_card_color_id");
+
+                    b.ToTable("color_card", (string)null);
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CreatureTypeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_creatures_type");
+
+                    b.ToTable("creatures_type", (string)null);
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.Deck.DeckDetailEntity", b =>
@@ -415,6 +614,32 @@ namespace DiceClub.Database.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.ToTable("mtg_dump", (string)null);
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.RarityEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_rarity");
+
+                    b.ToTable("rarity", (string)null);
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Inventory.Inventory", b =>
@@ -563,67 +788,6 @@ namespace DiceClub.Database.Migrations
                     b.ToTable("inventory_movements", (string)null);
                 });
 
-            modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.CardTypeEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("CardType")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("card_type");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_card_types");
-
-                    b.ToTable("card_types", (string)null);
-                });
-
-            modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.ColorCardEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("CardId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("card_id");
-
-                    b.Property<Guid>("ColorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("color_id");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_color_card");
-
-                    b.HasIndex("CardId")
-                        .HasDatabaseName("ix_color_card_card_id");
-
-                    b.HasIndex("ColorId")
-                        .HasDatabaseName("ix_color_card_color_id");
-
-                    b.ToTable("color_card", (string)null);
-                });
-
             modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.ColorEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -650,58 +814,6 @@ namespace DiceClub.Database.Migrations
                     b.ToTable("colors", (string)null);
                 });
 
-            modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.CreatureTypeEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_creatures_type");
-
-                    b.ToTable("creatures_type", (string)null);
-                });
-
-            modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.RarityEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_rarity");
-
-                    b.ToTable("rarity", (string)null);
-                });
-
             modelBuilder.Entity("DiceClub.Database.Entities.Account.UserGroup", b =>
                 {
                     b.HasOne("DiceClub.Database.Entities.Account.DiceClubGroup", "Group")
@@ -723,6 +835,36 @@ namespace DiceClub.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardCardLegality", b =>
+                {
+                    b.HasOne("DiceClub.Database.Entities.Cards.CardEntity", "Card")
+                        .WithMany("CardLegalities")
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_card_card_legality_cards_card_id");
+
+                    b.HasOne("DiceClub.Database.Entities.Cards.CardLegalityEntity", "CardLegality")
+                        .WithMany()
+                        .HasForeignKey("CardLegalityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_card_card_legality_card_legalities_card_legality_id");
+
+                    b.HasOne("DiceClub.Database.Entities.Cards.CardLegalityTypeEntity", "CardLegalityType")
+                        .WithMany()
+                        .HasForeignKey("CardLegalityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_card_card_legality_card_lagality_types_card_legality_type_id");
+
+                    b.Navigation("Card");
+
+                    b.Navigation("CardLegality");
+
+                    b.Navigation("CardLegalityType");
+                });
+
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardEntity", b =>
                 {
                     b.HasOne("DiceClub.Database.Entities.Cards.CardSetEntity", "CardSet")
@@ -732,19 +874,19 @@ namespace DiceClub.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_cards_card_sets_card_set_id");
 
-                    b.HasOne("Mtg.Collection.Manager.Database.Entities.CardTypeEntity", "CardType")
+                    b.HasOne("DiceClub.Database.Entities.Cards.CardTypeEntity", "CardType")
                         .WithMany("Cards")
                         .HasForeignKey("CardTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_cards_card_types_card_type_id");
 
-                    b.HasOne("Mtg.Collection.Manager.Database.Entities.CreatureTypeEntity", "CreatureType")
+                    b.HasOne("DiceClub.Database.Entities.Cards.CreatureTypeEntity", "CreatureType")
                         .WithMany("Cards")
                         .HasForeignKey("CreatureTypeId")
                         .HasConstraintName("fk_cards_creatures_type_creature_type_id");
 
-                    b.HasOne("Mtg.Collection.Manager.Database.Entities.RarityEntity", "Rarity")
+                    b.HasOne("DiceClub.Database.Entities.Cards.RarityEntity", "Rarity")
                         .WithMany()
                         .HasForeignKey("RarityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -767,6 +909,27 @@ namespace DiceClub.Database.Migrations
                     b.Navigation("Rarity");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.ColorCardEntity", b =>
+                {
+                    b.HasOne("DiceClub.Database.Entities.Cards.CardEntity", "Card")
+                        .WithMany("ColorCards")
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_color_card_cards_card_id");
+
+                    b.HasOne("Mtg.Collection.Manager.Database.Entities.ColorEntity", "Color")
+                        .WithMany("ColorCards")
+                        .HasForeignKey("ColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_color_card_colors_color_id");
+
+                    b.Navigation("Card");
+
+                    b.Navigation("Color");
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.Deck.DeckDetailEntity", b =>
@@ -839,27 +1002,6 @@ namespace DiceClub.Database.Migrations
                     b.Navigation("Receiver");
                 });
 
-            modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.ColorCardEntity", b =>
-                {
-                    b.HasOne("DiceClub.Database.Entities.Cards.CardEntity", "Card")
-                        .WithMany("ColorCards")
-                        .HasForeignKey("CardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_color_card_cards_card_id");
-
-                    b.HasOne("Mtg.Collection.Manager.Database.Entities.ColorEntity", "Color")
-                        .WithMany("ColorCards")
-                        .HasForeignKey("ColorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_color_card_colors_color_id");
-
-                    b.Navigation("Card");
-
-                    b.Navigation("Color");
-                });
-
             modelBuilder.Entity("DiceClub.Database.Entities.Account.DiceClubGroup", b =>
                 {
                     b.Navigation("UserGroups");
@@ -872,10 +1014,22 @@ namespace DiceClub.Database.Migrations
 
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardEntity", b =>
                 {
+                    b.Navigation("CardLegalities");
+
                     b.Navigation("ColorCards");
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardSetEntity", b =>
+                {
+                    b.Navigation("Cards");
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardTypeEntity", b =>
+                {
+                    b.Navigation("Cards");
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CreatureTypeEntity", b =>
                 {
                     b.Navigation("Cards");
                 });
@@ -890,19 +1044,9 @@ namespace DiceClub.Database.Migrations
                     b.Navigation("Inventories");
                 });
 
-            modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.CardTypeEntity", b =>
-                {
-                    b.Navigation("Cards");
-                });
-
             modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.ColorEntity", b =>
                 {
                     b.Navigation("ColorCards");
-                });
-
-            modelBuilder.Entity("Mtg.Collection.Manager.Database.Entities.CreatureTypeEntity", b =>
-                {
-                    b.Navigation("Cards");
                 });
 #pragma warning restore 612, 618
         }

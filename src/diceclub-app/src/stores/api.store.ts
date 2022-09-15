@@ -50,10 +50,12 @@ class ApiClientStore {
 	}
 
 	checkAuthToken() {
-		var auth = localStorage.getItem("auth");
+		const auth = localStorage.getItem("auth");
 		if (auth) {
 			const { token, refreshToken, expire } = JSON.parse(auth);
-			if (expire > new Date()) {
+			console.log("Check authentication");
+			if (new Date(expire) > new Date()) {
+				console.log("Token found");
 				this.setAuthenticated(token, refreshToken, expire);
 			}
 		}
@@ -65,6 +67,7 @@ class ApiClientStore {
 		localStorage.setItem("auth", JSON.stringify({ token, refreshToken, expire }));
 	}
 	public async request<T>(request: ApiRequest): Promise<ApiResponse<T>> {
+		this.rootStore.setIsLoading = true;
 		request.url = `${apiConfig.baseURL}${request.url}`;
 		const response: ApiResponse<T> = {
 			isError: false,
@@ -104,6 +107,7 @@ class ApiClientStore {
 					axiosResponse = await axios.delete(request.url, { headers });
 					break;
 			}
+			this.rootStore.setIsLoading = false;
 			if (axiosResponse) {
 				response.statusCode = axiosResponse.status;
 				response.statusText = axiosResponse.statusText;
@@ -115,6 +119,7 @@ class ApiClientStore {
 		} catch (err) {
 			response.isError = true;
 			response.errorData = err;
+			this.rootStore.setIsLoading = false;
 			return response;
 		}
 	}

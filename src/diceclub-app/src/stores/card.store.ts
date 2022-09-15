@@ -1,9 +1,25 @@
 import { RootStore } from "./root.store";
 import { makeAutoObservable } from "mobx";
-import { CardDtoPaginationObject, CardQueryObject } from "../schemas/dice-club";
+import {
+	CardDtoPaginationObject,
+	CardLegalityDto,
+	CardLegalityTypeDto,
+	CardQueryObject,
+	CardSetDto,
+	CardSetDtoPaginationObject,
+	CardTypeDto
+} from "../schemas/dice-club";
 import { ApiClientStore } from "./api.store";
+import { apiRoutes } from "../api_client/api.routes";
+import { apiConfig } from "../api_client/api.config";
+import { ICardColor } from "../interfaces/cards/cardcolor.interfaces";
 export class CardStore {
 	rootStore: RootStore;
+	cardTypes: CardTypeDto[] = [];
+	cardLegalities: CardLegalityDto[] = [];
+	cardLegailityTypes: CardLegalityTypeDto[] = [];
+	cardSets: CardSetDto[] = [];
+	cardColors: ICardColor[] = [];
 	cardSearchResult?: CardDtoPaginationObject;
 	searchQuery: CardQueryObject = {};
 	totalPages: number = 0;
@@ -11,6 +27,7 @@ export class CardStore {
 	pageSize: number = 30;
 	cardTableView: number = 5;
 	apiClient: ApiClientStore;
+
 	constructor(rootStore: RootStore) {
 		makeAutoObservable(this);
 		this.rootStore = rootStore;
@@ -26,6 +43,13 @@ export class CardStore {
 	}
 	set setCardTableView(view: number) {
 		this.cardTableView = view;
+	}
+	get getSets() {
+		return this.cardSets;
+	}
+
+	set addSets(sets: CardSetDto[]) {
+		this.cardSets = [...this.cardSets, ...sets];
 	}
 
 	get getQuery() {
@@ -43,8 +67,82 @@ export class CardStore {
 			await this.searchCardsWithQuery(this.searchQuery!, this.currentPage, this.pageSize);
 		}
 	}
+	async goToPage(page: number) {
+		this.currentPage = page;
+		await this.searchCardsWithQuery(this.searchQuery!, this.currentPage, this.pageSize);
+	}
 	set setQuery(searchQuery: CardQueryObject) {
 		this.searchQuery = searchQuery;
+	}
+	async getAllCardSets() {
+		let page = 1;
+		let allSetUrl = `${apiRoutes.CARDS.ALL_SETS}?page=${page}&pageSize=${apiConfig.defaultPageSize}`;
+
+		let result = await this.apiClient.request<CardSetDtoPaginationObject>({
+			method: "get",
+			url: allSetUrl
+		});
+		this.addSets = result.data?.result!;
+		while (page < result.data?.totalPages!) {
+			page++;
+			allSetUrl = `${apiRoutes.CARDS.ALL_SETS}?page=${page}&pageSize=${apiConfig.defaultPageSize}`;
+			result = await this.apiClient.request<CardSetDtoPaginationObject>({
+				method: "get",
+				url: allSetUrl
+			});
+			this.addSets = result.data?.result!;
+		}
+	}
+	async getAllLegalities() {
+		const legalities = await this.apiClient.request<CardLegalityDto[]>({
+			method: "get",
+			url: apiRoutes.CARDS.ALL_LEGALITIES
+		});
+		const legalityType = await this.apiClient.request<CardLegalityTypeDto[]>({
+			method: "get",
+			url: apiRoutes.CARDS.ALL_LEGALITIES_TYPES
+		});
+
+		this.cardLegalities = legalities.data!;
+		this.cardLegailityTypes = legalityType.data!;
+	}
+	async getAllTypes() {
+		const types = await this.apiClient.request<CardTypeDto[]>({
+			method: "get",
+			url: apiRoutes.CARDS.ALL_TYPES
+		});
+
+		this.cardTypes = types.data!;
+	}
+
+	getAllCardColors() {
+		this.cardColors = [
+			{
+				key: "R",
+				text: "Red",
+				value: "R"
+			},
+			{
+				key: "G",
+				text: "Green",
+				value: "G"
+			},
+			{
+				key: "B",
+				text: "Blue",
+				value: "B"
+			},
+			{
+				key: "W",
+				text: "White",
+				value: "W"
+			},
+			{
+				key: "U",
+				text: "Black",
+				value: "U"
+			}
+		];
 	}
 
 	async searchCards() {
@@ -62,7 +160,7 @@ export class CardStore {
 
 		const result = await this.apiClient.request<CardDtoPaginationObject>({
 			method: "post",
-			url: "/api/v1/card/search?pageNum=" + page + "&pageSize=" + size,
+			url: `${apiRoutes.CARDS.SEARCH}?pageNum=${page}&pageSize=${size}`,
 			payload: query
 		});
 

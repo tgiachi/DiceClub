@@ -16,8 +16,7 @@ namespace DiceClub.Database.Context
         public DbSet<Inventory> Inventory { get; set; }
         public DbSet<InventoryCategory> InventoryCategories { get; set; }
         public DbSet<InventoryMovement> InventoryMovements { get; set; }
-
-
+        
         public DbSet<CardEntity> Cards { get; set; }
         public DbSet<ColorEntity> Colors { get; set; }
         public DbSet<CardTypeEntity> CardTypes { get; set; }
@@ -26,6 +25,9 @@ namespace DiceClub.Database.Context
         public DbSet<RarityEntity> Rarities { get; set; }
         public DbSet<ColorCardEntity> CardColors { get; set; }
         public DbSet<CardSetEntity> CardSets { get; set; }
+        public DbSet<CardLegalityEntity> CardLegalities { get; set; }
+        public DbSet<CardLegalityTypeEntity> CardLegalityTypes { get; set; }
+        public DbSet<CardCardLegality> CardCardLegalities { get; set; }
 
         public DbSet<DeckMasterEntity> DeckMaster { get; set; }
         public DbSet<DeckDetailEntity> DeckDetails { get; set; }
@@ -45,7 +47,7 @@ namespace DiceClub.Database.Context
         protected override void OnModelCreating(ModelBuilder model)
         {
             model.Entity<CardEntity>()
-                .HasGeneratedTsVectorColumn(p => p.SearchVector, "italian", p => new { p.CardName, p.Description })
+                .HasGeneratedTsVectorColumn(p => p.SearchVector, "italian", p => new { p.CardName, p.Description, p.TypeLine })
                 .HasIndex(p => p.SearchVector)
                 .HasMethod("GIN");
             

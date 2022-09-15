@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Grid, Image } from "semantic-ui-react";
+import { Card, Grid, Image, Pagination, Segment } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../../stores/store.context";
 import { DiceCard } from "./card.component";
@@ -16,16 +16,23 @@ export const CardSearchResultTable = observer(() => {
 	const [cardViewNumber, setCardViewNumber] = React.useState(cardsStore.cardTableView);
 
 	return (
-		<Grid columns={cardViewNumber} divided>
-			<Grid.Row>
-				{cards?.map((card) => {
-					return (
-						<Grid.Column key={card.id}>
-							<DiceCard card={card} />
-						</Grid.Column>
-					);
-				})}
-			</Grid.Row>
-		</Grid>
+		<Segment.Group>
+			<Segment>
+				<Pagination
+					onPageChange={(e, data) => {
+						cardsStore.goToPage(data.activePage as number);
+					}}
+					defaultActivePage={cardsStore.currentPage}
+					totalPages={cardsStore.totalPages}
+				></Pagination>
+			</Segment>
+			<Segment>
+				<Card.Group itemsPerRow={cardViewNumber}>
+					{cards?.map((card) => {
+						return <DiceCard key={card.id} card={card} />;
+					})}
+				</Card.Group>
+			</Segment>
+		</Segment.Group>
 	);
 });
