@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Card, Grid, Image, Pagination, Segment } from "semantic-ui-react";
+import { Card, Grid, Image, Pagination, Segment, Statistic, Sticky } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../../stores/store.context";
 import { DiceCard } from "./card.component";
@@ -18,6 +18,9 @@ export const CardSearchResultTable = observer(() => {
 	return (
 		<Segment.Group>
 			<Segment>
+		
+			</Segment>
+			<Segment>
 				<Pagination
 					onPageChange={(e, data) => {
 						cardsStore.goToPage(data.activePage as number);
@@ -25,6 +28,10 @@ export const CardSearchResultTable = observer(() => {
 					defaultActivePage={cardsStore.currentPage}
 					totalPages={cardsStore.totalPages}
 				></Pagination>
+					<Statistic >
+					<Statistic.Value>{cardsStore.getTotalCards}</Statistic.Value>
+					<Statistic.Label>Carte</Statistic.Label>
+				</Statistic>
 			</Segment>
 			<Segment>
 				<Card.Group itemsPerRow={cardViewNumber}>
@@ -32,6 +39,15 @@ export const CardSearchResultTable = observer(() => {
 						return <DiceCard key={card.id} card={card} />;
 					})}
 				</Card.Group>
+			</Segment>
+			<Segment>
+				<Pagination
+					onPageChange={(e, data) => {
+						cardsStore.goToPage(data.activePage as number);
+					}}
+					defaultActivePage={cardsStore.currentPage}
+					totalPages={cardsStore.totalPages}
+				></Pagination>
 			</Segment>
 		</Segment.Group>
 	);

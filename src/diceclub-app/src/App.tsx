@@ -10,18 +10,33 @@ import { Dashboard } from "./routes/dashboard/dashboards";
 import { LoaderComponent } from "./components/loader.component";
 import { CardContainer } from "./routes/cards/cards";
 import { Container } from "semantic-ui-react";
-import "./App.css"
+import "./App.css";
+import { AuthenticatedRoute } from "./helpers/authenticated.route";
 const App = () => (
 	<StoreContext.Provider value={initialValues}>
 		<LoaderComponent>
 			<Navbar />
-			<Container fluid className="main-container">
+			<Container className="main-container" fluid>
 				<BrowserRouter>
 					<Routes>
 						<Route path="/" element={<Login />} />
 						<Route path="/login" element={<Login />} />
-						<Route path="/dashboard" element={<Dashboard />} />
-						<Route path="/dashboard/cards" element={<CardContainer />} />
+						<Route
+							path="/dashboard"
+							element={
+								<AuthenticatedRoute>
+									<Dashboard />
+								</AuthenticatedRoute>
+							}
+						/>
+						<Route
+							path="/dashboard/cards"
+							element={
+								<AuthenticatedRoute>
+									<CardContainer />
+								</AuthenticatedRoute>
+							}
+						/>
 					</Routes>
 				</BrowserRouter>
 			</Container>

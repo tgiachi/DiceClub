@@ -13,7 +13,7 @@ export const AuthenticatedRoute = observer(({ children, path }: RouteProps) => {
 	// }, [rootStore.apiStore.isAutheticated]);
 
 	if (rootStore.apiStore.isAutheticated) {
-		return <Route path={path} element={children} />;
+		return children;
 	} else {
 		return <Navigate to="/login" state={{ from: location }} />;
 	}

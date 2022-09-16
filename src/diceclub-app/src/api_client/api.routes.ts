@@ -8,6 +8,11 @@ export const apiRoutes = {
 		ALL_TYPES: "/api/v1/card/types",
 		ALL_LEGALITIES: "/api/v1/card/legalities",
 		ALL_LEGALITIES_TYPES: "/api/v1/card/legalities/types",
+		ALL_RARITIES: "/api/v1/card/rarities",
 		SEARCH: "/api/v1/card/search"
+
+	},
+	USERS: {
+		LIST: "/api/v1/users/list",
 	}
 };

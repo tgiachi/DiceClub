@@ -1,4 +1,6 @@
-﻿namespace DiceClub.Services.Data.Card;
+﻿using ScryfallApi.Client.Apis;
+
+namespace DiceClub.Services.Data.Card;
 
 public class CardQueryObject
 {
@@ -6,6 +8,6 @@ public class CardQueryObject
     public string? Name { get; set; }
     public List<string>? Colors { get; set; }
     public List<string>? Rarity { get; set; }
-    
+    public List<string>? Sets { get; set; }
     public List<string>? Types { get; set; }
 }

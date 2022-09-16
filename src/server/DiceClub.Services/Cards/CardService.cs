@@ -62,11 +62,17 @@ public class CardService : AbstractBaseService<CardService>
         return _cardTypeDao.FindAll();
     }
 
+    public Task<List<RarityEntity>> FindAllRarities()
+    {
+        return _rarityDao.FindAll();
+    }
+
     public async Task<List<CardEntity>> SearchCards(CardQueryObject query)
     {
         var colorsGuids = new List<Guid>();
         var raririesGuids = new List<Guid>();
         var types = new List<Guid>();
+        var sets = new List<Guid>();
 
         if (query.Colors != null)
         {
@@ -76,6 +82,18 @@ public class CardService : AbstractBaseService<CardService>
                 if (color != null)
                 {
                     colorsGuids.Add(color.Id);
+                }
+            }
+        }
+
+        if (query.Sets != null)
+        {
+            foreach (var querySet in query.Sets)
+            {
+                var set = await _cardSetDao.FindById(querySet);
+                if (set != null)
+                {
+                    sets.Add(set.Id);
                 }
             }
         }
@@ -119,7 +137,7 @@ public class CardService : AbstractBaseService<CardService>
 
             if (colorsGuids.Any())
             {
-                entities = entities.Where(s => s.ColorCards.All(x => colorsGuids.Any(y => x.ColorId == y)));
+                entities = entities.Where(s => s.ColorCards.All(x => colorsGuids.Contains(x.ColorId)));
             }
 
             if (raririesGuids.Any())
@@ -130,6 +148,11 @@ public class CardService : AbstractBaseService<CardService>
             if (types.Any())
             {
                 entities = entities.Where(s => types.Contains(s.CardTypeId));
+            }
+
+            if (sets.Any())
+            {
+                entities = entities.Where(s => sets.Contains(s.CardSetId));
             }
 
             if (!string.IsNullOrEmpty(query.Description))

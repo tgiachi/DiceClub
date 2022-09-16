@@ -7,7 +7,8 @@ import {
 	CardQueryObject,
 	CardSetDto,
 	CardSetDtoPaginationObject,
-	CardTypeDto
+	CardTypeDto,
+	CardRarityDto
 } from "../schemas/dice-club";
 import { ApiClientStore } from "./api.store";
 import { apiRoutes } from "../api_client/api.routes";
@@ -18,11 +19,14 @@ export class CardStore {
 	cardTypes: CardTypeDto[] = [];
 	cardLegalities: CardLegalityDto[] = [];
 	cardLegailityTypes: CardLegalityTypeDto[] = [];
+
 	cardSets: CardSetDto[] = [];
 	cardColors: ICardColor[] = [];
+	cardRarities: CardRarityDto[] = [];
 	cardSearchResult?: CardDtoPaginationObject;
 	searchQuery: CardQueryObject = {};
 	totalPages: number = 0;
+	totalCards: number = 0;
 	currentPage: number = 1;
 	pageSize: number = 30;
 	cardTableView: number = 5;
@@ -52,6 +56,25 @@ export class CardStore {
 		this.cardSets = [...this.cardSets, ...sets];
 	}
 
+	set setTotalCards(totalCards: number) {
+		this.totalCards = totalCards;
+	}
+	get getTotalCards() {	
+		return this.totalCards;
+	}
+
+	set setRarities(rarities: CardRarityDto[]) {
+		this.cardRarities = rarities;
+	}
+	get getRarities() {
+		return this.cardRarities;
+	}
+	set setTypes(types: CardTypeDto[]) {
+		this.cardTypes = types;
+	}
+	get getTypes() {
+		return this.cardTypes;
+	}
 	get getQuery() {
 		return this.searchQuery;
 	}
@@ -83,6 +106,7 @@ export class CardStore {
 			url: allSetUrl
 		});
 		this.addSets = result.data?.result!;
+
 		while (page < result.data?.totalPages!) {
 			page++;
 			allSetUrl = `${apiRoutes.CARDS.ALL_SETS}?page=${page}&pageSize=${apiConfig.defaultPageSize}`;
@@ -111,8 +135,15 @@ export class CardStore {
 			method: "get",
 			url: apiRoutes.CARDS.ALL_TYPES
 		});
+		this.setTypes = types.data!;
+	}
 
-		this.cardTypes = types.data!;
+	async getAllRarities() {
+		const rarities = await this.apiClient.request<CardRarityDto[]>({
+			method: "get",
+			url: apiRoutes.CARDS.ALL_RARITIES
+		});
+		this.setRarities = rarities.data!;
 	}
 
 	getAllCardColors() {
@@ -157,6 +188,7 @@ export class CardStore {
 			size = this.pageSize;
 		}
 		this.searchQuery = query;
+	
 
 		const result = await this.apiClient.request<CardDtoPaginationObject>({
 			method: "post",
@@ -168,6 +200,7 @@ export class CardStore {
 			this.rootStore.errorsStore.addError("Error during search cards!", "error");
 		}
 		this.cardSearchResult = result.data;
+		this.setTotalCards = this.cardSearchResult?.count!;
 		this.totalPages = result.data?.totalPages || 0;
 	}
 }

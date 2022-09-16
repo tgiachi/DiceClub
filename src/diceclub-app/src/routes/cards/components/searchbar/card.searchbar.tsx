@@ -7,6 +7,7 @@ import { ColorDropDown } from "./color.dropdown";
 import { DescriptionSearch } from "./description.input";
 import { SetsDropDown } from "./sets.searchbar";
 import { CardTypeDropDown } from "./cardtype.dropdown";
+import { CardRarityDropDown } from "./cardrarity.dropdown";
 
 export const CardSearchBar = observer(() => {
 	const { rootStore } = useStore();
@@ -33,15 +34,17 @@ export const CardSearchBar = observer(() => {
 					<ColorDropDown />
 					<SetsDropDown />
 					<CardTypeDropDown />
+					<CardRarityDropDown />
 				</Form.Group>
 				<Form.Group>
 					<Form.Button
 						primary
+						icon="search"
 						onClick={() => {
 							rootStore.cardsStore.searchCards();
 						}}
 					>
-						Search
+						Ricerca
 					</Form.Button>
 				</Form.Group>
 			</Form>

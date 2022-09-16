@@ -28,10 +28,11 @@ public class CardController : BaseAuthController
     private readonly CardLegalityTypeMapper _cardLegalityTypeMapper;
     private readonly CardCreatureTypeDtoMapper _cardCreatureTypeDtoMapper;
     private readonly CardTypeDtoMapper _cardTypeDtoMapper;
-    
+    private readonly CardRarityDtoMapper _cardRarityDtoMapper;
 
 
-    public CardController(ImportService importService, ImportMtgService importMtgService, CardService cardService, IRestPaginatorService restPaginatorService, CardDtoMapper cardDtoMapper, CardSetDtoMapper cardSetDtoMapper, CardLegalityDtoMapper cardLegalityDtoMapper, CardLegalityTypeMapper cardLegalityTypeMapper, CardCreatureTypeDtoMapper cardCreatureTypeDtoMapper, CardTypeDtoMapper cardTypeDtoMapper)
+
+    public CardController(ImportService importService, ImportMtgService importMtgService, CardService cardService, IRestPaginatorService restPaginatorService, CardDtoMapper cardDtoMapper, CardSetDtoMapper cardSetDtoMapper, CardLegalityDtoMapper cardLegalityDtoMapper, CardLegalityTypeMapper cardLegalityTypeMapper, CardCreatureTypeDtoMapper cardCreatureTypeDtoMapper, CardTypeDtoMapper cardTypeDtoMapper, CardRarityDtoMapper cardRarityDtoMapper)
     {
         _importService = importService;
         _importMtgService = importMtgService;
@@ -43,6 +44,7 @@ public class CardController : BaseAuthController
         _cardLegalityTypeMapper = cardLegalityTypeMapper;
         _cardCreatureTypeDtoMapper = cardCreatureTypeDtoMapper;
         _cardTypeDtoMapper = cardTypeDtoMapper;
+        _cardRarityDtoMapper = cardRarityDtoMapper;
     }
 
     [HttpGet]
@@ -52,14 +54,14 @@ public class CardController : BaseAuthController
         return await _restPaginatorService.Paginate<Guid, CardSetEntity, CardSetDto, CardSetDtoMapper>(
             await _cardService.FindAllSets(), page, pageSize, _cardSetDtoMapper);
     }
-    
+
     [HttpGet]
     [Route("creatures/types")]
     public async Task<List<CreatureTypeDto>> GetCreatureTypes()
     {
-        return  _cardCreatureTypeDtoMapper.ToDto(await _cardService.FindAllCreatureTypes());
+        return _cardCreatureTypeDtoMapper.ToDto(await _cardService.FindAllCreatureTypes());
     }
-    
+
     [HttpGet]
     [Route("types")]
     public async Task<List<CardTypeDto>> GetCardTypes()
@@ -67,19 +69,26 @@ public class CardController : BaseAuthController
         return _cardTypeDtoMapper.ToDto(await _cardService.FindAllCardTypes());
     }
 
-    
+    [HttpGet]
+    [Route("rarities")]
+    public async Task<List<CardRarityDto>> GetCardRarities()
+    {
+        return _cardRarityDtoMapper.ToDto(await _cardService.FindAllRarities());
+    }
+
+
     [HttpGet]
     [Route("legalities")]
     public async Task<List<CardLegalityDto>> GetAllCartLegalities()
     {
-        return  _cardLegalityDtoMapper.ToDto(await _cardService.FindAllLegalities());
+        return _cardLegalityDtoMapper.ToDto(await _cardService.FindAllLegalities());
     }
-    
+
     [HttpGet]
     [Route("legalities/types")]
     public async Task<List<CardLegalityTypeDto>> GetAllCartLegalitiesType()
     {
-        return  _cardLegalityTypeMapper.ToDto(await _cardService.FindAllLegalityTypes());
+        return _cardLegalityTypeMapper.ToDto(await _cardService.FindAllLegalityTypes());
     }
 
     [HttpPost]

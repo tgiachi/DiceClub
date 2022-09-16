@@ -54,6 +54,12 @@ export interface CardDto {
 	userId?: string;
 	user?: DiceClubUserDto;
 	description?: string | null;
+	isColorLess?: boolean;
+	ilMultiColor?: boolean;
+	typeLine?: string | null;
+
+	/** @format int32 */
+	collectionNumber?: number;
 }
 
 export interface CardDtoPaginationObject {
@@ -101,6 +107,8 @@ export interface CardQueryObject {
 	name?: string | null;
 	colors?: string[] | null;
 	rarity?: string[] | null;
+	sets?: string[] | null;
+	types?: string[] | null;
 }
 
 export interface CardRarityDto {
@@ -334,6 +342,19 @@ export namespace Api {
 		export type RequestBody = never;
 		export type RequestHeaders = {};
 		export type ResponseBody = CardTypeDto[];
+	}
+	/**
+	 * No description
+	 * @tags Card
+	 * @name V1CardRaritiesList
+	 * @request GET:/api/v1/card/rarities
+	 */
+	export namespace V1CardRaritiesList {
+		export type RequestParams = {};
+		export type RequestQuery = {};
+		export type RequestBody = never;
+		export type RequestHeaders = {};
+		export type ResponseBody = CardRarityDto[];
 	}
 	/**
 	 * No description

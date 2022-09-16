@@ -19,10 +19,12 @@ export class PreloaderStore {
 
 	async preloadData() {
 		Promise.all([
+			this.rootStore.usersStore.getUsersAsync(),
 			this.rootStore.cardsStore.getAllCardSets(),
 			this.rootStore.cardsStore.getAllLegalities(),
 			this.rootStore.cardsStore.getAllTypes(),
-			this.rootStore.cardsStore.getAllCardColors()
+			this.rootStore.cardsStore.getAllCardColors(),
+			this.rootStore.cardsStore.getAllRarities(),
 		]);
 	}
 }
