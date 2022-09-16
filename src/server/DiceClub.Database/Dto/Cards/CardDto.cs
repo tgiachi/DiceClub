@@ -38,5 +38,12 @@ public class CardDto : AbstractGuidDtoEntity
     public DiceClubUserDto User { get; set; }
 
     public string Description { get; set; }
-
+    
+    public bool IsColorLess { get; set; }
+        
+    public bool IlMultiColor { get; set; }
+    
+    public string TypeLine { get; set; }
+    
+    public int CollectionNumber { get; set; } 
 }

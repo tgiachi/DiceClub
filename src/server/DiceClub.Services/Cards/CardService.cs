@@ -22,8 +22,9 @@ public class CardService : AbstractBaseService<CardService>
     private readonly CreatureTypeDao _creatureTypeDao;
 
 
-
-    public CardService(IEventBusService eventBusService, ILogger<CardService> logger, CardsDao cardsDao, ColorsDao colorsDao, RarityDao rarityDao, CardSetDao cardSetDao, CardLegalityDao cardLegalityDao, CardLegalityTypeDao cardLegalityTypeDao, CardTypeDao cardTypeDao, CreatureTypeDao creatureTypeDao) : base(
+    public CardService(IEventBusService eventBusService, ILogger<CardService> logger, CardsDao cardsDao,
+        ColorsDao colorsDao, RarityDao rarityDao, CardSetDao cardSetDao, CardLegalityDao cardLegalityDao,
+        CardLegalityTypeDao cardLegalityTypeDao, CardTypeDao cardTypeDao, CreatureTypeDao creatureTypeDao) : base(
         eventBusService, logger)
     {
         _cardsDao = cardsDao;
@@ -63,9 +64,9 @@ public class CardService : AbstractBaseService<CardService>
 
     public async Task<List<CardEntity>> SearchCards(CardQueryObject query)
     {
-
         var colorsGuids = new List<Guid>();
         var raririesGuids = new List<Guid>();
+        var types = new List<Guid>();
 
         if (query.Colors != null)
         {
@@ -75,6 +76,18 @@ public class CardService : AbstractBaseService<CardService>
                 if (color != null)
                 {
                     colorsGuids.Add(color.Id);
+                }
+            }
+        }
+
+        if (query.Types != null)
+        {
+            foreach (var queryType in query.Types)
+            {
+                var type = await _cardTypeDao.FindByName(queryType);
+                if (type != null)
+                {
+                    types.Add(type.Id);
                 }
             }
         }
@@ -93,7 +106,6 @@ public class CardService : AbstractBaseService<CardService>
 
         return await _cardsDao.QueryAsList(entities =>
         {
-
             entities = entities
                 .Include(s => s.Rarity)
                 .Include(j => j.ColorCards)
@@ -115,6 +127,11 @@ public class CardService : AbstractBaseService<CardService>
                 entities = entities.Where(s => raririesGuids.Contains(s.RarityId));
             }
 
+            if (types.Any())
+            {
+                entities = entities.Where(s => types.Contains(s.CardTypeId));
+            }
+
             if (!string.IsNullOrEmpty(query.Description))
             {
                 entities = entities.Where(s =>
@@ -124,7 +141,6 @@ public class CardService : AbstractBaseService<CardService>
             }
 
             return entities;
-
         });
     }
 }

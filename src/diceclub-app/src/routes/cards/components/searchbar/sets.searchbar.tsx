@@ -16,7 +16,11 @@ export const SetsDropDown = () => {
 					return {
 						key: s.id,
 						text: s.description,
-						value: s.description
+						value: s.description,
+						image: {
+							avatar: true,
+							src: s.image
+						}
 					} as ICardColor;
 				})}
 			></Form.Select>

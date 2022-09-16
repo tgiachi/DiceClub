@@ -15,21 +15,23 @@ public class CardsSeed : AbstractDbSeed<Guid, ColorCardEntity>
 {
     private readonly ScryfallApiClient _scryfallApiClient;
     private readonly CardSetDao _cardSetDao;
-    public CardsSeed(ColorCardDao dao, ILogger<AbstractDbSeed<Guid, ColorCardEntity>> logger, ScryfallApiClient scryfallApiClient, CardSetDao cardSetDao) : base(dao, logger)
+    private readonly CardSymbolDao _cardSymbolDao;
+    public CardsSeed(ColorCardDao dao, ILogger<AbstractDbSeed<Guid, ColorCardEntity>> logger, ScryfallApiClient scryfallApiClient, CardSetDao cardSetDao, CardSymbolDao cardSymbolDao) : base(dao, logger)
     {
         _scryfallApiClient = scryfallApiClient;
         _cardSetDao = cardSetDao;
+        _cardSymbolDao = cardSymbolDao;
     }
 
     public async override Task<bool> Seed()
     {
         var sets = await _scryfallApiClient.Sets.Get();
-
+        
         foreach (var set in sets.Data)
         {
             await _cardSetDao.CreateIfNotExists(set.Code, set.Name, set.IconSvgUri != null ? set.IconSvgUri.ToString() : " ");
         }
-
+        
         return true;
     }
 }
