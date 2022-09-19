@@ -22,6 +22,10 @@ public class MtgEntity : BaseGuidEntity
     [MaxLength(3000)]
     public string ForeignNames { get; set; }
     
+    public string? ImageUrl { get; set; }
+    
+    public string SetCode { get; set; }
+    
     public NpgsqlTsVector SearchVector { get; set; }
     
 }

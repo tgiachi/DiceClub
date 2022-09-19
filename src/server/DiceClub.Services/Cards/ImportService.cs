@@ -33,6 +33,7 @@ namespace DiceClub.Services.Cards
         private readonly CardLegalityTypeDao _cardLegalityTypeDao;
         private readonly CardCardLegalityDao _cardCardLegalityDao;
         private readonly CreatureTypeDao _creatureTypeDao;
+        private readonly CardService _cardService;
 
         private readonly ImportMtgService _importMtgService;
 
@@ -47,7 +48,7 @@ namespace DiceClub.Services.Cards
             CardsDao cardsDao,
             CardSetDao cardSetDao,
             CardLegalityDao cardLegalityDao,
-            ImportMtgService importMtgService, CardLegalityTypeDao cardLegalityTypeDao, CardCardLegalityDao cardCardLegalityDao, CreatureTypeDao creatureTypeDao) : base(eventBusService, logger)
+            ImportMtgService importMtgService, CardLegalityTypeDao cardLegalityTypeDao, CardCardLegalityDao cardCardLegalityDao, CreatureTypeDao creatureTypeDao, CardService cardService) : base(eventBusService, logger)
         {
             _scryfallApiClient = scryfallApiClient;
             _colorCardDao = colorCardDao;
@@ -60,6 +61,7 @@ namespace DiceClub.Services.Cards
             _cardLegalityTypeDao = cardLegalityTypeDao;
             _cardCardLegalityDao = cardCardLegalityDao;
             _creatureTypeDao = creatureTypeDao;
+            _cardService = cardService;
             _cardLegalityDao = cardLegalityDao;
         }
 
@@ -289,135 +291,13 @@ namespace DiceClub.Services.Cards
             }
         }
 
-        private async Task AddCard(Card card, Guid userId, int index)
-        {
-            try
-            {
-                var mana = TokenUtils.ExtractManaToken(card.ManaCost);
-                var type = card.TypeLine.Split('—')[0].Trim();
 
-         
-                var exists = await _cardsDao.CheckIfCardExists(card.Name);
-
-                if (exists)
-                {
-                    await _cardsDao.IncrementQuantity(card.Name);
-                }
-                else
-                {
-                    var colors = new List<ColorEntity>();
-
-                    if (card.Colors != null)
-                    {
-                        foreach (var color in card.Colors)
-                        {
-                            colors.Add(await _colorsDao.QueryAsSingle(entities =>
-                                entities.Where(s => s.Name == color)));
-                        }
-                    }
-
-                    var cardType =
-                        await _cardTypeDao.QueryAsSingle(entities => entities.Where(s => s.CardType == type));
-                    var rarity = await _rarityDao.QueryAsSingle(entities => entities.Where(s => s.Name == card.Rarity));
-                    var setId = await _cardSetDao.FindById(card.Set);
-
-                    var imageLink = "";
-
-                    if (card.ImageUris != null)
-                    {
-                        if (card.ImageUris.ContainsKey("large"))
-                        {
-                            imageLink = card.ImageUris["large"].ToString();
-                        }
-                        else
-                        {
-                            imageLink = card.ImageUris["normal"].ToString();
-                        }
-                    }
-                    
-                    var cardEntity = new CardEntity()
-                    {
-                        CardName = card.PrintedName ?? card.Name,
-                        // Colors = colors,
-                        CardTypeId = cardType.Id,
-                        ManaCost = card.ManaCost ?? " ",
-                        TotalManaCosts = mana,
-                        Quantity = 1,
-                        ImageUrl = imageLink,
-                        TypeLine = card.TypeLine ?? " ",
-                        Price = card.Prices.Eur,
-                        MtgId = card.MtgoId,
-                        RarityId = rarity.Id,
-                        UserId = userId,
-                        Description = card.PrintedText ?? card.OracleText ?? "",
-                        CardSetId = setId.Id,
-                        IsColorLess = colors.Count == 0,
-                        IlMultiColor = colors.Count > 1
-                    };
-                    
-                    if (!string.IsNullOrEmpty(card.CollectorNumber))
-                    {
-                        try
-                        {
-                            var cn = int.Parse(card.CollectorNumber);
-                            cardEntity.CollectionNumber = cn;
-                        }
-                        catch
-                        {
-                            
-                        }
-                    }
-                     
-                    if (!string.IsNullOrEmpty(card.TypeLine))
-                    {
-                        if (card.TypeLine.ToLower().StartsWith("creature"))
-                        {
-                            var creatureTypeStr = card.TypeLine.Split('—')[1].Trim();
-                            var creatureType = await _creatureTypeDao.FindByName(creatureTypeStr);
-                            cardEntity.CreatureTypeId = creatureType.Id;
-                        }   
-                    }
-                    await _cardsDao.Insert(cardEntity);
-                    
-                    foreach (var color in colors)
-                    {
-                        await _colorCardDao.Insert(new ColorCardEntity()
-                        {
-                            CardId = cardEntity.Id,
-                            ColorId = color.Id,
-                        });
-                    }
-
-                    if (card.Legalities != null)
-                    {
-                        foreach (var legality in card.Legalities)
-                        {
-                            var legalityName = await _cardLegalityDao.FindByName(legality.Key);
-                            var legalityType = await _cardLegalityTypeDao.FindByName(legality.Value);
-
-                            await _cardCardLegalityDao.Insert(new CardCardLegality()
-                            {
-                                CardId = cardEntity.Id,
-                                CardLegalityId = legalityName.Id,
-                                CardLegalityTypeId = legalityType.Id
-                            });
-                        }
-                    }
-                    
-                    Logger.LogInformation("{Name} - {ManaCost} - total: {Mana} - [{Index}]", card.Name, card.ManaCost, mana, index);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error during inserting card: {Ex}", ex);
-            }
-        }
 
         public async Task AddCards(List<Card> cards, Guid userId)
         {
             await cards.ParallelForEachAsync(async (card, index) =>
             {
-                await AddCard(card, userId, (int)index);
+                await _cardService.AddCard(card, userId, (int)index);
             }, 30);
         }
     }

@@ -411,6 +411,51 @@ namespace DiceClub.Database.Migrations
                     b.ToTable("card_sets", (string)null);
                 });
 
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardStagingEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<bool>("IsAdded")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_added");
+
+                    b.Property<bool>("IsFoil")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_foil");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("language");
+
+                    b.Property<int?>("MtgId")
+                        .HasColumnType("integer")
+                        .HasColumnName("mtg_id");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_date");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_cards_staging");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_cards_staging_user_id");
+
+                    b.ToTable("cards_staging", (string)null);
+                });
+
             modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardTypeEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -592,6 +637,10 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("character varying(3000)")
                         .HasColumnName("foreign_names");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
+
                     b.Property<int?>("MultiverseId")
                         .HasColumnType("integer")
                         .HasColumnName("multiverse_id");
@@ -603,6 +652,11 @@ namespace DiceClub.Database.Migrations
                         .HasColumnName("search_vector")
                         .HasAnnotation("Npgsql:TsVectorConfig", "italian")
                         .HasAnnotation("Npgsql:TsVectorProperties", new[] { "CardName", "ForeignNames" });
+
+                    b.Property<string>("SetCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("set_code");
 
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp without time zone")
@@ -910,6 +964,18 @@ namespace DiceClub.Database.Migrations
                     b.Navigation("CreatureType");
 
                     b.Navigation("Rarity");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DiceClub.Database.Entities.Cards.CardStagingEntity", b =>
+                {
+                    b.HasOne("DiceClub.Database.Entities.Account.DiceClubUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_cards_staging_users_user_id");
 
                     b.Navigation("User");
                 });
