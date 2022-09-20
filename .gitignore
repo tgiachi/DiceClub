@@ -98,3 +98,4 @@ modules.xml
 .idea/sonarlint
 src/server/.vs
 *.bak
+src/diceclub-server/.vs
