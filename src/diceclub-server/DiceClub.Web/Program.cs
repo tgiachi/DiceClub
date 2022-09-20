@@ -1,3 +1,4 @@
+using System.Text;
 using Aurora.Api.Entities.Interfaces.Services;
 using Aurora.Api.Entities.MethodEx;
 using Aurora.Api.JsonConverters;
@@ -8,7 +9,11 @@ using Autofac.Extensions.DependencyInjection;
 using ConfigurationSubstitution;
 using DiceClub.Database.Context;
 using DiceClub.Services.Modules;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
@@ -80,6 +85,32 @@ namespace DiceClub.Web
                 options.JsonSerializerOptions.Converters.Add(new JsonConverterForType());
             });
 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+            });
+
+            //builder.Services.AddApiVersioning(options =>
+            //{
+            //    options.AssumeDefaultVersionWhenUnspecified = true;
+
+            //    options.DefaultApiVersion = new ApiVersion(1, 0);
+            //    //    options.ReportApiVersions = true;
+            //    options.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version"),
+            //        new HeaderApiVersionReader("X-Version"),
+            //        new MediaTypeApiVersionReader("ver"));
+            //});
 
             // Add services to the container.
             builder.Services.AddAuthorization();
@@ -87,8 +118,13 @@ namespace DiceClub.Web
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
 
             using (var scope = app.Services.CreateScope())
             {
@@ -100,15 +136,20 @@ namespace DiceClub.Web
 
                 await dbSeedService.ExecuteDbSeeds();
             }
+            //app.UseDefaultFiles();
+            //app.UseStaticFiles();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
 
+
+            app.UseAuthentication();
             app.UseAuthorization();
+       
+
 
             await app.RunAsync();
         }

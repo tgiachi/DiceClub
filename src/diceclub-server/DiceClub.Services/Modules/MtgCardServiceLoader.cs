@@ -21,6 +21,7 @@ namespace DiceClub.Services.Modules
                 ScryfallApiClientConfig.GetDefault())).AsSelf();
 
             builder.RegisterType<MtgServiceProvider>().AsSelf().SingleInstance();
+            builder.RegisterType<MtgCardService>().AsSelf().SingleInstance();
 
             base.Load(builder);
         }
