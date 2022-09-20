@@ -35,4 +35,27 @@ public class MtgDao : AbstractDataAccess<Guid, MtgEntity, DiceClubDbContext>
     {
         return QueryAsSingle(entities => entities.Where(s => s.CardName == name));
     }
+
+    public Task<List<MtgEntity>> FindByListOfIds(List<int?> mtgIds)
+    {
+        return QueryAsList(entities => entities.Where(s => mtgIds.Contains(s.MultiverseId)));
+    }
+
+    public Task<List<MtgEntity>> SearchCard(string name, string? setCode )
+    {
+      
+        return QueryAsList(entities =>
+        {
+            entities = entities.Where(s => EF.Functions.ToTsVector("italian", s.CardName +"  "+ s.ForeignNames )
+                    .Matches($"{name}:*"));
+
+                if (setCode != null)
+                {
+                    entities = entities.Where(s => s.SetCode.ToLower() == setCode.ToLower());
+                }
+
+                return entities;
+            });
+        
+    }
 }

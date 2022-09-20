@@ -28,6 +28,8 @@ namespace DiceClub.Database.Context
         public DbSet<CardLegalityEntity> CardLegalities { get; set; }
         public DbSet<CardLegalityTypeEntity> CardLegalityTypes { get; set; }
         public DbSet<CardCardLegality> CardCardLegalities { get; set; }
+        
+        public DbSet<CardStagingEntity> CardsStaging { get; set; }
 
         public DbSet<DeckMasterEntity> DeckMaster { get; set; }
         public DbSet<DeckDetailEntity> DeckDetails { get; set; }
