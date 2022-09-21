@@ -19,5 +19,21 @@ namespace DiceClub.Database.Dao.Cards
         public MtgCardTypeDao(IDbContextFactory<DiceClubDbContext> dbContext, ILogger<MtgCardTypeEntity> logger) : base(dbContext, logger)
         {
         }
+
+        public async Task<MtgCardTypeEntity> AddIfNotExists(string name)
+        {
+            var exists = await QueryAsSingle(entities => entities.Where(s => s.Name.ToLower() == name.ToLower()));
+
+            if (exists != null)
+            {
+                return exists;
+            }
+
+            return await Insert(new MtgCardTypeEntity
+            {
+                Name = name
+            });
+
+        }
     }
 }

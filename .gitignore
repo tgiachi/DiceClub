@@ -99,3 +99,4 @@ modules.xml
 src/server/.vs
 *.bak
 src/diceclub-server/.vs
+src/diceclub-server/.idea

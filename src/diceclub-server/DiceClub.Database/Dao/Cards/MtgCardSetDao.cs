@@ -20,6 +20,11 @@ namespace DiceClub.Database.Dao.Cards
         {
         }
 
+        public Task<MtgCardSetEntity> FindByCode(string code)
+        {
+            return QueryAsSingle(entities => entities.Where(s => s.Code == code));
+        }
+
         public async Task<MtgCardSetEntity> InsertIfNotExists(string code, string description, string image, int cardCount)
         {
             var exists = await QueryAsSingle(entities =>

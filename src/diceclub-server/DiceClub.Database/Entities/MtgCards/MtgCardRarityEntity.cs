@@ -16,6 +16,6 @@ namespace DiceClub.Database.Entities.MtgCards
         public string Name { get; set; }
 
         [MaxLength(200)]
-        public string Image { get; set; }
+        public string? Image { get; set; }
     }
 }

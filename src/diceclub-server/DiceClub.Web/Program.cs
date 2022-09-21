@@ -9,6 +9,7 @@ using Autofac.Extensions.DependencyInjection;
 using ConfigurationSubstitution;
 using DiceClub.Database.Context;
 using DiceClub.Services.Modules;
+using DiceClub.Web.Controllers.WebSocket;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -51,11 +52,7 @@ namespace DiceClub.Web
                 .AddEnvironmentVariables()
                 .EnableSubstitutions();
 
-            builder.Services.AddDbContextFactory<DiceClubDbContext>(options =>
-            {
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DiceClubDb".ReplaceEnv()))
-                    .UseCamelCaseNamingConvention();
-            });
+         
 
             builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
             builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
@@ -84,6 +81,12 @@ namespace DiceClub.Web
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonConverterForType());
             });
+            
+            builder.Services.AddDbContextFactory<DiceClubDbContext>(options =>
+            {
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DiceClubDb".ReplaceEnv()))
+                    .UseCamelCaseNamingConvention();
+            });
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -101,17 +104,20 @@ namespace DiceClub.Web
                 };
             });
 
-            //builder.Services.AddApiVersioning(options =>
-            //{
-            //    options.AssumeDefaultVersionWhenUnspecified = true;
+            builder.Services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
 
-            //    options.DefaultApiVersion = new ApiVersion(1, 0);
-            //    //    options.ReportApiVersions = true;
-            //    options.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version"),
-            //        new HeaderApiVersionReader("X-Version"),
-            //        new MediaTypeApiVersionReader("ver"));
-            //});
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                //    options.ReportApiVersions = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version"),
+                    new HeaderApiVersionReader("X-Version"),
+                    new MediaTypeApiVersionReader("ver"));
+            });
 
+            builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+            builder.Services.AddControllers();
             // Add services to the container.
             builder.Services.AddAuthorization();
 
@@ -125,19 +131,20 @@ namespace DiceClub.Web
             app.UseSwagger();
             app.UseSwaggerUI();
 
-
+            app.MapHub<NotificationsHub>("/websocket/notifications");
+            
             using (var scope = app.Services.CreateScope())
             {
                 var financeDb = scope.ServiceProvider.GetService<DiceClubDbContext>();
 
-                await financeDb?.Database.MigrateAsync();
+                await financeDb!.Database.MigrateAsync();
 
                 var dbSeedService = scope.ServiceProvider.GetService<IDbSeedService>();
 
-                await dbSeedService.ExecuteDbSeeds();
+                await dbSeedService!.ExecuteDbSeeds();
             }
-            //app.UseDefaultFiles();
-            //app.UseStaticFiles();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             app.UseCors(x => x
                 .AllowAnyMethod()
@@ -148,8 +155,7 @@ namespace DiceClub.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
-       
-
+            app.MapControllers();
 
             await app.RunAsync();
         }

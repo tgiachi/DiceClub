@@ -1,10 +1,9 @@
-﻿
-
-using System.Globalization;
+﻿using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using DiceClub.Api.Data.Rest;
 using DiceClub.Database.Dao;
 using DiceClub.Database.Dao.Account;
 using DiceClub.Database.Entities.Account;
@@ -30,7 +29,7 @@ namespace DiceClub.Web.Controllers.Auth
             _diceClubUserDao = diceClubUserDao;
         }
 
-        private async Task<LoginResponseData> GenerateToken(DiceClubUser user)
+        private async Task<RestResultObject<LoginResponseData>> GenerateToken(DiceClubUser user)
         {
             var claims = new[]
             {
@@ -63,29 +62,32 @@ namespace DiceClub.Web.Controllers.Auth
 
             await _diceClubUserDao.UpdateRefreshToken(user.Email, refreshToken);
 
-            return new LoginResponseData
-            { AccessToken = new JwtSecurityTokenHandler().WriteToken(token), RefreshToken = refreshToken, AccessTokenExpire = expire };
+            return RestResultObjectBuilder<LoginResponseData>.Create().Data(new LoginResponseData
+            {
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(token), RefreshToken = refreshToken,
+                AccessTokenExpire = expire
+            }).Build();
         }
 
 
         [HttpPost]
         [Route("auth")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestData requestData)
+        public async Task<ActionResult<RestResultObject<LoginResponseData>>> Login(
+            [FromBody] LoginRequestData requestData)
         {
-
             if (requestData != null && requestData.Email != null && requestData.Password != null)
             {
                 var user = await _diceClubUserDao.Authenticate(requestData.Email, requestData.Password);
 
                 if (user != null)
                 {
-
                     var token = await GenerateToken(user);
 
-                    return Ok(token);
+                    return RestResultObjectBuilder<LoginResponseData>.Create().Data(token.Result).Build();
                 }
 
-                return BadRequest("Invalid credentials");
+                return BadRequest(RestResultObjectBuilder<LoginResponseData>.Create()
+                    .Error(new Exception("Invalid login")).Build());
             }
 
             return BadRequest();
@@ -94,7 +96,8 @@ namespace DiceClub.Web.Controllers.Auth
         [AllowAnonymous]
         [HttpPost]
         [Route("refresh_token")]
-        public async Task<IActionResult> RefreshToken([FromBody] LoginResponseData tokenModel)
+        public async Task<ActionResult<RestResultObject<LoginRequestData>>> RefreshToken(
+            [FromBody] LoginResponseData tokenModel)
         {
             if (tokenModel is null)
             {
@@ -104,7 +107,8 @@ namespace DiceClub.Web.Controllers.Auth
             var user = await _diceClubUserDao.FindUserByRefreshToken(tokenModel.RefreshToken);
             if (user == null)
             {
-                return BadRequest("Invalid client request");
+                return BadRequest(RestResultObjectBuilder<LoginResponseData>.Create()
+                    .Error(new Exception("Invalid user")).Build());
             }
 
             return Ok(GenerateToken(user));
@@ -119,6 +123,4 @@ namespace DiceClub.Web.Controllers.Auth
             return Convert.ToBase64String(randomNumber);
         }
     }
-
-
 }

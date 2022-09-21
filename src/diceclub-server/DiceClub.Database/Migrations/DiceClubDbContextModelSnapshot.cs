@@ -319,11 +319,15 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<double?>("Cmc")
-                        .HasColumnType("double precision")
+                    b.Property<int?>("CardMarketId")
+                        .HasColumnType("integer")
+                        .HasColumnName("card_market_id");
+
+                    b.Property<decimal?>("Cmc")
+                        .HasColumnType("numeric")
                         .HasColumnName("cmc");
 
-                    b.Property<int>("CollectorNumber")
+                    b.Property<int?>("CollectorNumber")
                         .HasColumnType("integer")
                         .HasColumnName("collector_number");
 
@@ -335,6 +339,12 @@ namespace DiceClub.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<string>("ForeignNames")
+                        .IsRequired()
+                        .HasMaxLength(600)
+                        .HasColumnType("character varying(600)")
+                        .HasColumnName("foreign_names");
 
                     b.Property<string>("HighResImageUrl")
                         .HasMaxLength(150)
@@ -377,9 +387,13 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("owner_id");
 
-                    b.Property<int>("Power")
+                    b.Property<int?>("Power")
                         .HasColumnType("integer")
                         .HasColumnName("power");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
 
                     b.Property<string>("PrintedName")
                         .IsRequired()
@@ -407,13 +421,13 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("tsvector")
                         .HasColumnName("search_vector")
                         .HasAnnotation("Npgsql:TsVectorConfig", "italian")
-                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Name", "Description", "TypeLine", "PrintedName" });
+                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Name", "Description", "TypeLine", "PrintedName", "ForeignNames" });
 
                     b.Property<Guid>("SetId")
                         .HasColumnType("uuid")
                         .HasColumnName("set_id");
 
-                    b.Property<int>("Toughness")
+                    b.Property<int?>("Toughness")
                         .HasColumnType("integer")
                         .HasColumnName("toughness");
 
@@ -601,7 +615,6 @@ namespace DiceClub.Database.Migrations
                         .HasColumnName("created_date");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("image");

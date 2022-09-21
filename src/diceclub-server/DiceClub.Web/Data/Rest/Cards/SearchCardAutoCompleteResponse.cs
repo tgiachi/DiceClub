@@ -4,6 +4,6 @@ public class SearchCardAutoCompleteResponse
 {
     public string SearchText { get; set; } = null!;
 
-    public List<SearchAutoCompleteCard> AutoCompleteCards { get; set; }
+    public List<SearchAutoCompleteCard> AutoCompleteCards { get; set; } = null!;
 
 }

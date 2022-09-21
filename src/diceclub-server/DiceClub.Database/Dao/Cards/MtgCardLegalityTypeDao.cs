@@ -19,6 +19,11 @@ namespace DiceClub.Database.Dao.Cards
         public MtgCardLegalityTypeDao(IDbContextFactory<DiceClubDbContext> dbContext, ILogger<MtgCardLegalityTypeEntity> logger) : base(dbContext, logger)
         {
         }
+        
+        public  Task<MtgCardLegalityTypeEntity> FindByName(string name)
+        {
+            return QueryAsSingle(entities => entities.Where(s => s.Name.ToLower() == name.ToLower()));
+        }
 
         public async Task<MtgCardLegalityTypeEntity> InsertIfNotExists(string name)
         {

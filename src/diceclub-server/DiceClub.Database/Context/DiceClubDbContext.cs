@@ -13,8 +13,8 @@ namespace DiceClub.Database.Context
 {
     public class DiceClubDbContext : BaseDbContext
     {
-
         #region Accounting
+
         public DbSet<DiceClubUser> Users { get; set; }
         public DbSet<DiceClubGroup> Groups { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
@@ -44,19 +44,17 @@ namespace DiceClub.Database.Context
 
         public DiceClubDbContext()
         {
-
         }
 
         public DiceClubDbContext(DbContextOptions options) : base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder model)
         {
-
             model.Entity<MtgCardEntity>()
-                .HasGeneratedTsVectorColumn(p => p.SearchVector, "italian", p => new { p.Name, p.Description, p.TypeLine, p.PrintedName })
+                .HasGeneratedTsVectorColumn(p => p.SearchVector, "italian",
+                    p => new { p.Name, p.Description, p.TypeLine, p.PrintedName, p.ForeignNames })
                 .HasIndex(p => p.SearchVector)
                 .HasMethod("GIN");
 
@@ -76,9 +74,9 @@ namespace DiceClub.Database.Context
             optionsBuilder.UseSnakeCaseNamingConvention();
             if (!optionsBuilder.IsConfigured)
                 optionsBuilder
-                    .UseNpgsql(@"Server=127.0.0.1;Port=5432;Database=diceclub_prod_db;User Id=postgres;Password=password;")
+                    .UseNpgsql(
+                        @"Server=127.0.0.1;Port=5432;Database=diceclub_prod_db;User Id=postgres;Password=password;")
                     .UseSnakeCaseNamingConvention();
-
         }
     }
 }

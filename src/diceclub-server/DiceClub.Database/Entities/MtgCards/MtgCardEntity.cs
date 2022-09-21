@@ -31,7 +31,10 @@ namespace DiceClub.Database.Entities.MtgCards
 
         [MaxLength(150)]
         public string Name { get; set; }
-
+        
+        [MaxLength(600)]
+        public string ForeignNames { get; set; }
+        
         [MaxLength(150)]
         public string PrintedName { get; set; }
 
@@ -46,13 +49,13 @@ namespace DiceClub.Database.Entities.MtgCards
         [MaxLength(100)]
         public string? ManaCost { get; set; }
 
-        public double? Cmc { get; set; }
+        public decimal? Cmc { get; set; }
 
-        public int Power { get; set; }
+        public int? Power { get; set; }
 
-        public int Toughness { get; set; }
+        public int? Toughness { get; set; }
 
-        public int CollectorNumber { get; set; }
+        public int? CollectorNumber { get; set; }
 
         public Guid SetId { get; set; }
 
@@ -68,7 +71,9 @@ namespace DiceClub.Database.Entities.MtgCards
         public string? HighResImageUrl { get; set; }
         public Guid TypeId { get; set; }
         public virtual MtgCardTypeEntity Type { get; set; }
-
+        
+        public int? CardMarketId { get; set; }
+        
         public int Quantity { get; set; }
 
         public virtual List<MtgCardColorRelEntity> Colors { get; set; }
@@ -81,5 +86,7 @@ namespace DiceClub.Database.Entities.MtgCards
 
         public bool IsColorLess { get; set; }
         public bool IsMultiColor { get; set; }
+        
+        public decimal? Price { get; set; }
     }
 }

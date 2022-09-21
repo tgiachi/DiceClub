@@ -14,7 +14,6 @@ using ScryfallApi.Client;
 
 namespace DiceClub.Services.DbSeeds
 {
-
     [DbSeed(1)]
     public class MtgCardsDbSeed : AbstractDbSeed<Guid, MtgCardEntity>
     {
@@ -28,21 +27,26 @@ namespace DiceClub.Services.DbSeeds
 
         private readonly Dictionary<string, string> _colors = new()
         {
-            {"W", "White"},
-            {"U", "Blue"},
-            {"B", "Black"},
-            {"R", "Red"},
-            {"G", "Green"},
-
+            { "W", "White" },
+            { "U", "Blue" },
+            { "B", "Black" },
+            { "R", "Red" },
+            { "G", "Green" },
         };
 
         private readonly Dictionary<string, string> _languages = new()
         {
-            {"English", "en"},
-            {"Italian", "it"}
+            { "English", "en" },
+            { "Italian", "it" },
+            { "Spanish", "es" },
+            { "Japanese", "ja" },
+            { "Chinese", "cn" }
         };
 
-        public MtgCardsDbSeed(MtgCardDao dao, ILogger<AbstractDbSeed<Guid, MtgCardEntity>> logger, MtgCardColorDao mtgCardColorDao, MtgCardSetDao mtgCardSetDao, MtgCardRarityDao mtgCardRarityDao, ScryfallApiClient scryfallApiClient, MtgCardLegalityDao mtgCardLegalityDao, MtgCardLegalityTypeDao mtgCardLegalityTypeDao, MtgCardLanguageDao mtgCardLanguageDao) : base(dao, logger)
+        public MtgCardsDbSeed(MtgCardDao dao, ILogger<AbstractDbSeed<Guid, MtgCardEntity>> logger,
+            MtgCardColorDao mtgCardColorDao, MtgCardSetDao mtgCardSetDao, MtgCardRarityDao mtgCardRarityDao,
+            ScryfallApiClient scryfallApiClient, MtgCardLegalityDao mtgCardLegalityDao,
+            MtgCardLegalityTypeDao mtgCardLegalityTypeDao, MtgCardLanguageDao mtgCardLanguageDao) : base(dao, logger)
         {
             _mtgCardColorDao = mtgCardColorDao;
             _mtgCardSetDao = mtgCardSetDao;
@@ -67,9 +71,9 @@ namespace DiceClub.Services.DbSeeds
             _logger.LogInformation("Checking sets");
             var sets = await _scryfallApiClient.Sets.Get();
 
+            _logger.LogInformation("Checking set: {Count}", sets.Data.Count);
             foreach (var set in sets.Data)
             {
-                _logger.LogInformation("Checking set: {Set} - {Description}", set.Name, set.Code);
                 await _mtgCardSetDao.InsertIfNotExists(set.Code, set.Name, set.IconSvgUri.ToString(), set.card_count);
             }
         }
@@ -82,7 +86,6 @@ namespace DiceClub.Services.DbSeeds
                 await _mtgCardColorDao.InsertIfNotExists(color.Key, color.Value,
                     $"https://c2.scryfall.com/file/scryfall-symbols/card-symbols/{color.Key}.svg");
             }
-
         }
 
         private async Task CheckLegalities()

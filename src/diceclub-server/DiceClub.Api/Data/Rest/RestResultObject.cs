@@ -14,4 +14,32 @@ namespace DiceClub.Api.Data.Rest
 
         public bool HaveError { get; set; }
     }
+
+    public class RestResultObjectBuilder<TData>
+    {
+        private RestResultObject<TData> _resultObject = new();
+
+        public static RestResultObjectBuilder<TData> Create()
+        {
+            return new RestResultObjectBuilder<TData>();
+        }
+
+        public RestResultObjectBuilder<TData> Data(TData data)
+        {
+            _resultObject.Result = data;
+            return this;
+        }
+
+        public RestResultObjectBuilder<TData> Error(Exception ex)
+        {
+            _resultObject.Error = ex.Message;
+            _resultObject.HaveError = true;
+            return this;
+        }
+
+        public RestResultObject<TData> Build()
+        {
+            return _resultObject;
+        }
+    }
 }

@@ -19,5 +19,22 @@ namespace DiceClub.Database.Dao.Cards
         public MtgCardDao(IDbContextFactory<DiceClubDbContext> dbContext, ILogger<MtgCardEntity> logger) : base(dbContext, logger)
         {
         }
+
+        public async Task<bool> CheckCardExistsAndIncQuantity(string cardName, string setCode, Guid user, int incQuantity = 1)
+        {
+            var card = await QueryAsSingle(entities => entities
+                .Where(s => s.Name == cardName && s.Set.Code == setCode && s.OwnerId == user)
+                .Include(s => s.Set));
+
+            if (card != null)
+            {
+                card.Quantity = card.Quantity + incQuantity;
+                await Update(card);
+                return true;
+            }
+
+            return false;
+
+        }
     }
 }

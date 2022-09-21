@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Aurora.Api.Attributes;
 using Autofac;
+using DiceClub.Services.Cards;
 using MtgApiManager.Lib.Service;
 using ScryfallApi.Client;
 
@@ -22,6 +23,7 @@ namespace DiceClub.Services.Modules
 
             builder.RegisterType<MtgServiceProvider>().AsSelf().SingleInstance();
             builder.RegisterType<MtgCardService>().AsSelf().SingleInstance();
+            builder.RegisterType<CardService>().AsSelf().SingleInstance();
 
             base.Load(builder);
         }
