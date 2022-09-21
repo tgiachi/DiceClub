@@ -8,8 +8,10 @@ using CsvHelper;
 using Dasync.Collections;
 using DiceClub.Api.Data;
 using DiceClub.Api.Data.Cards;
+using DiceClub.Database.Context;
 using DiceClub.Database.Dao.Cards;
 using DiceClub.Database.Entities.MtgCards;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ScryfallApi.Client;
 using ScryfallApi.Client.Models;
@@ -55,10 +57,53 @@ public class CardService : AbstractBaseService<CardService>
         _mtgCardLegalityRelDao = mtgCardLegalityRelDao;
     }
 
+
+    public async Task<List<MtgCardEntity>> SearchCards(SearchCardRequest request, Guid userId)
+    {
+        var colors = new List<Guid>();
+
+        if (request.Colors != null)
+        {
+            foreach (var c in request.Colors)
+            {
+                var color = await _mtgCardColorDao.QueryAsSingle(entities => entities.Where(s => s.Name == c));
+                if (color != null)
+                {
+                    colors.Add(color.Id);
+                }
+            }
+        }
+
+        var result = await _mtgCardDao.QueryAsList(entities =>
+        {
+            if (!string.IsNullOrEmpty(request.Description))
+            {
+                entities = entities.Where(s => s.OwnerId == userId);
+                
+                entities = entities.Where(s =>
+                    EF.Functions.ToTsVector("italian", s.Description)
+                        .Matches($"{request.Description}:*")
+                );
+
+                if (colors.Any())
+                {
+                    entities = entities.Where(s => s.Colors.All(k => colors.Contains(k.ColorId)));
+                }
+            }
+            return entities;
+        });
+
+
+        return result;
+    }
+
     public async Task ImportCsv(string fileName, CardCsvImportType importFormat, Guid userId)
     {
         await PublishEvent(NotificationEventBuilder.Create().Broadcast().Message($"Importing CSV format {importFormat}")
-            .Title("Import").Type(NotificationEventType.Information).ToUser(userId).Build());
+            .Title("Import")
+            .Type(NotificationEventType.Information)
+            .ToUser(userId)
+            .Build());
 
         switch (importFormat)
         {
