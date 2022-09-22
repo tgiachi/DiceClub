@@ -98,6 +98,7 @@ public class CardService : AbstractBaseService<CardService>
 
             entities = entities
                 .Include(s => s.Colors)
+                .ThenInclude(s => s.Color)
                 .Include(s => s.Language)
                 .Include(s => s.Rarity)
                 .Include(s => s.Set)
@@ -132,6 +133,7 @@ public class CardService : AbstractBaseService<CardService>
                 }
             }
 
+            entities = entities.AsSplitQuery();
             return entities;
         });
 
