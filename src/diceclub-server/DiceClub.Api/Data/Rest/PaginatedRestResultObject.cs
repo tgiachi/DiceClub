@@ -51,10 +51,7 @@ public class PaginatedRestResultObjectBuilder<TData>
     public new PaginatedRestResultObjectBuilder<TData> Data(List<TData> data)
     {
         _restResult.Result = data;
-        if (data is IList list)
-        {
-            _restResult.Count = list.Count;
-        }
+        
 
         return this;
     }

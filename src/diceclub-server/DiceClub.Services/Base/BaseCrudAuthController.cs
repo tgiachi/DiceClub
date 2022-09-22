@@ -72,6 +72,29 @@ public abstract class BaseCrudAuthController<TEntity, TDto, TDbContext> : BaseGr
         
     }
     
+    [HttpGet]
+    [Route("{id:guid}")]
+    public async Task<ActionResult<RestResultObject<TDto>>> FindById(Guid id)
+    {
+        var useRoute = await UserCanUseRoute();
+        if (!useRoute)
+        {
+            return DoUnauthorizedObject<TDto>();
+        }
+
+        try
+        {
+            var dtoEntity = _dtoMapper.ToDto(await _dataAccess.FindById(id));
+            return Ok(RestResultObjectBuilder<TDto>.Create().Data(dtoEntity).Build());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                RestResultObjectBuilder<TDto>.Create().Error(ex).Build());
+        }
+        
+    }
+    
     [HttpPatch]
     public async Task<ActionResult<RestResultObject<TDto>>> Update([FromBody] TDto dto)
     {

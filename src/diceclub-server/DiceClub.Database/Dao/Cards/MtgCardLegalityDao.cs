@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Aurora.Api.Attributes;
 using Aurora.Api.Entities.Impl.Dao;
+using Aurora.Api.Entities.Interfaces.Dto;
 using DiceClub.Database.Context;
 using DiceClub.Database.Entities.MtgCards;
 using Microsoft.EntityFrameworkCore;

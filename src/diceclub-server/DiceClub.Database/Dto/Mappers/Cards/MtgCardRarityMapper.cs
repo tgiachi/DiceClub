@@ -6,10 +6,10 @@ using DiceClub.Database.Entities.MtgCards;
 
 namespace DiceClub.Database.Dto.Mappers.Cards;
 
-[DtoMapper(typeof(MtgCardColorEntity), typeof(MtgCardColorDto))]
-public class MtgCardColorMapper : AbstractDtoMapper<Guid, MtgCardColorEntity, MtgCardColorDto>
+[DtoMapper(typeof(MtgCardRarityEntity), typeof(MtgCardRarityDto))]
+public class MtgCardRarityMapper : AbstractDtoMapper<Guid, MtgCardRarityEntity, MtgCardRarityDto>
 {
-    public MtgCardColorMapper(IMapper mapper) : base(mapper)
+    public MtgCardRarityMapper(IMapper mapper) : base(mapper)
     {
     }
 }

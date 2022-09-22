@@ -13,9 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace DiceClub.Web.Controllers.Cards;
 
 [Route("api/v1/cards/[controller]")]
-public class ColorsController : BaseCrudAuthController<MtgCardColorEntity, MtgCardColorDto, DiceClubDbContext>
+public class RaritiesController :  BaseCrudAuthController<MtgCardRarityEntity, MtgCardRarityDto, DiceClubDbContext>
 {
-    public ColorsController(DiceClubUserDao diceClubUserDao, ILogger<ColorsController> logger, MtgCardColorDao dataAccess,MtgCardColorMapper dtoMapper, DiceClubDbContext dbContext, RestPaginatorService restPaginatorService) : base(diceClubUserDao, logger, dataAccess, dtoMapper, dbContext, restPaginatorService)
+    public RaritiesController(DiceClubUserDao diceClubUserDao, ILogger<RaritiesController> logger, MtgCardRarityDao dataAccess, MtgCardRarityMapper dtoMapper, DiceClubDbContext dbContext, RestPaginatorService restPaginatorService) : base(diceClubUserDao, logger, dataAccess, dtoMapper, dbContext, restPaginatorService)
     {
         CanDelete = false;
     }

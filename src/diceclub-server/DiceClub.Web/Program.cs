@@ -1,4 +1,6 @@
+using System.IO.Compression;
 using System.Text;
+using System.Text.Json.Serialization;
 using Aurora.Api.Entities.Interfaces.Services;
 using Aurora.Api.Entities.MethodEx;
 using Aurora.Api.JsonConverters;
@@ -13,6 +15,7 @@ using DiceClub.Web.Controllers.WebSocket;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -77,9 +80,11 @@ namespace DiceClub.Web
 
             builder.Host.UseSerilog();
 
-            builder.Services.AddControllers().AddJsonOptions(options =>
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonConverterForType());
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
             builder.Services.AddDbContextFactory<DiceClubDbContext>(options =>
@@ -122,6 +127,23 @@ namespace DiceClub.Web
             // Add services to the container.
             builder.Services.AddAuthorization();
 
+            builder.Services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+            });
+
+            builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Fastest;
+            });
+
+            builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.SmallestSize;
+            });
+            
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -158,6 +180,8 @@ namespace DiceClub.Web
 
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.UseResponseCompression();
+            app.UseResponseCaching();
 
             app.MapHub<NotificationsHub>("/websocket/notifications");
 

@@ -2,7 +2,7 @@
 
 namespace DiceClub.Database.Dto.Cards;
 
-public class MtgCardColorEntityDto : AbstractGuidDtoEntity
+public class MtgCardColorDto : AbstractGuidDtoEntity
 {
   
     public string Name { get; set; }

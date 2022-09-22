@@ -79,10 +79,15 @@ public class CardService : AbstractBaseService<CardService>
             if (!string.IsNullOrEmpty(request.Description))
             {
                 entities = entities.Where(s => s.OwnerId == userId);
-                
+
                 entities = entities.Where(s =>
                     EF.Functions.ToTsVector("italian", s.Description)
+                        .Matches($"{request.Description}:*") ||
+                    EF.Functions.ToTsVector("italian", s.ForeignNames)
+                        .Matches($"{request.Description}:*") ||
+                    EF.Functions.ToTsVector("italian", s.Name)
                         .Matches($"{request.Description}:*")
+                    
                 );
 
                 if (colors.Any())
@@ -90,6 +95,43 @@ public class CardService : AbstractBaseService<CardService>
                     entities = entities.Where(s => s.Colors.All(k => colors.Contains(k.ColorId)));
                 }
             }
+
+            entities = entities
+                .Include(s => s.Colors)
+                .Include(s => s.Language)
+                .Include(s => s.Rarity)
+                .Include(s => s.Set)
+                .Include(s => s.Type)
+                .Include(s => s.Legalities);
+
+            if (request.OrderBy != null)
+            {
+                switch (request.OrderBy)
+                {
+                    case SearchCardRequestOrderBy.Name:
+                        entities = entities.OrderBy(s => s.Name);
+                        break;
+                    case SearchCardRequestOrderBy.Price:
+                        entities = entities.OrderBy(s => s.Price);
+                        break;
+                    case SearchCardRequestOrderBy.Set:
+                        entities = entities.OrderBy(s => s.SetId);
+                        break;
+                    case SearchCardRequestOrderBy.CreatedDate:
+                        entities = entities.OrderBy(s => s.CreateDateTime);
+                        break;
+                    case SearchCardRequestOrderBy.Rarity:
+                        entities = entities.OrderBy(s => s.RarityId);
+                        break;
+                    case SearchCardRequestOrderBy.CardType:
+                        entities = entities.OrderBy(s => s.TypeId);
+                        break;
+                    case SearchCardRequestOrderBy.Quantity:
+                        entities = entities.OrderBy(s => s.Quantity);
+                        break;
+                }
+            }
+
             return entities;
         });
 
