@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Aurora.Api.Attributes;
 using Autofac;
+using DiceClub.Services.Paginator;
 
 namespace DiceClub.Services.Modules
 {
@@ -15,6 +16,7 @@ namespace DiceClub.Services.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<QueueService>().AsSelf().SingleInstance().AutoActivate();
+            builder.RegisterType<RestPaginatorService>().AsSelf().SingleInstance();
             base.Load(builder);
         }
     }

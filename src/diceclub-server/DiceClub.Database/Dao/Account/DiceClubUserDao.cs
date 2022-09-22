@@ -56,5 +56,21 @@ namespace DiceClub.Database.Dao.Account
         {
             return QueryAsSingle(users => users.Where(k => k.RefreshToken == refreshToken));
         }
+        
+        public async Task<List<string>> FindGroupsByUserId(Guid userId)
+        {
+            var groups = await QueryAsList<UserGroup>(users => users.Include(k => k.Group)
+                .Where(s => s.UserId == userId));
+
+            if (groups == null)
+            {
+                return new List<string>();
+            }
+
+            return groups.Select(s => s.Group.GroupName).ToList();
+
+
+
+        }
     }
 }

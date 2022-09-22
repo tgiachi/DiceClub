@@ -17,7 +17,7 @@ namespace DiceClub.Api.Data.Rest
 
     public class RestResultObjectBuilder<TData>
     {
-        private RestResultObject<TData> _resultObject = new();
+        protected RestResultObject<TData> _resultObject = new();
 
         public static RestResultObjectBuilder<TData> Create()
         {
