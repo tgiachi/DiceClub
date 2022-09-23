@@ -485,7 +485,8 @@ namespace DiceClub.Database.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
                         .HasColumnName("code");
 
                     b.Property<DateTime>("CreateDateTime")
@@ -494,7 +495,8 @@ namespace DiceClub.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
                     b.Property<DateTime>("UpdatedDateTime")
@@ -685,9 +687,19 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("CardName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("card_name");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_date");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
 
                     b.Property<bool>("IsAdded")
                         .HasColumnType("boolean")
@@ -701,9 +713,14 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("language_id");
 
-                    b.Property<int?>("MtgId")
+                    b.Property<int>("Quantity")
                         .HasColumnType("integer")
-                        .HasColumnName("mtg_id");
+                        .HasColumnName("quantity");
+
+                    b.Property<string>("ScryfallId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("scryfall_id");
 
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp without time zone")

@@ -1,15 +1,12 @@
 import { createContext, useContext } from "react";
-import { ApiClientStore } from "./api.store";
-import ErrorStore from "./errors.store";
-import LoginStore from "./login.store";
-import { RootStore } from "./root.store";
+import { RootStore } from "./rootStore";
 
 interface IStoresContext {
 	rootStore: RootStore;
 }
 
 const initialValues: IStoresContext = {
-	rootStore: new RootStore()
+	rootStore: new RootStore(),
 };
 
 const StoreContext = createContext<IStoresContext>(initialValues);
