@@ -8,6 +8,7 @@ import {
   LoginRequestDataRestResultObject,
   LoginResponseDataRestResultObject,
 } from "../schemas/dice-club";
+import { PaginatedRestResultObject } from "../api_client/paginated.interface";
 
 export type apiClientMethods = "get" | "post" | "put" | "delete" | "patch";
 
@@ -57,6 +58,29 @@ export class ApiClientStore {
         apiRoutes.PAGINATION.PAGE_SIZE
       )
     );
+    return result;
+  }
+  public async getPaginatedFull<TResult>(path: string) {
+    let page = 1;
+    const firstResult = await this.get<PaginatedRestResultObject<TResult>>(
+      apiRoutes.PAGINATION.buildPaginationQuery(
+        path,
+        page,
+        apiRoutes.PAGINATION.PAGE_SIZE
+      )
+    );
+
+    let result = firstResult.result!;
+    const pageCount = firstResult.pageCount!;
+
+    while (page < pageCount) {
+      page++;
+      const pageResult = await this.getPaginated<
+        PaginatedRestResultObject<TResult>
+      >(path, page);
+
+      result = result!.concat(pageResult!.result!);
+    }
     return result;
   }
 

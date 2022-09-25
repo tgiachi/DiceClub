@@ -3,9 +3,9 @@ import { apiRoutes } from "../api_client/api.routes";
 import { IBasePreloadStore } from "../interfaces/stores/store.interface";
 import {
   MtgCardColorDto,
-  MtgCardColorDtoPaginatedRestResultObject,
+  MtgCardLanguageDto,
+  MtgCardRarityDto,
   MtgCardSetDto,
-  MtgCardSetDtoPaginatedRestResultObject,
   MtgCardTypeDto,
 } from "../schemas/dice-club";
 import { ApiClientStore } from "./apiClientStore";
@@ -18,6 +18,9 @@ export class CardsStore implements IBasePreloadStore {
   @observable sets?: MtgCardSetDto[] = [];
   @observable types?: MtgCardTypeDto[] = [];
   @observable colors?: MtgCardColorDto[] = [];
+  @observable rarities: MtgCardRarityDto[] = [];
+  @observable languages: MtgCardLanguageDto[] = [];
+
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     this.apiClientStore = rootStore.apiClient;
@@ -25,75 +28,48 @@ export class CardsStore implements IBasePreloadStore {
   }
 
   async onAuthenticated(auth: string): Promise<void> {
-    Promise.all([this.loadSets(), this.loadColors(), this.loadTypes()]);
+    Promise.all([
+      this.loadSets(),
+      this.loadColors(),
+      this.loadTypes(),
+      this.loadRarities(),
+      this.loadLanguages(),
+    ]);
     return Promise.resolve();
   }
 
   @action
   async loadSets() {
-    let page = 1;
-    let pageCount = 0;
-    let result =
-      await this.apiClientStore.getPaginated<MtgCardSetDtoPaginatedRestResultObject>(
-        apiRoutes.CARDS.SETS,
-        page
-      );
-    this.sets = result.result!;
-    pageCount = result.pageCount!;
-
-    while (page < pageCount) {
-      page++;
-      result =
-        await this.apiClientStore.getPaginated<MtgCardSetDtoPaginatedRestResultObject>(
-          apiRoutes.CARDS.SETS,
-          page
-        );
-      this.sets = this.sets!.concat(result.result!);
-    }
+    this.sets = await this.apiClientStore.getPaginatedFull<MtgCardSetDto>(
+      apiRoutes.CARDS.SETS
+    );
   }
 
   @action
   async loadColors() {
-    let page = 1;
-    let pageCount = 0;
-    let result =
-      await this.apiClientStore.getPaginated<MtgCardColorDtoPaginatedRestResultObject>(
-        apiRoutes.CARDS.COLORS,
-        page
-      );
-    this.colors = result.result!;
-    pageCount = result.pageCount!;
-
-    while (page < pageCount) {
-      page++;
-      result =
-        await this.apiClientStore.getPaginated<MtgCardColorDtoPaginatedRestResultObject>(
-          apiRoutes.CARDS.COLORS,
-          page
-        );
-      this.sets = this.colors!.concat(result.result!);
-    }
+    this.colors = await this.apiClientStore.getPaginatedFull<MtgCardColorDto>(
+      apiRoutes.CARDS.COLORS
+    );
   }
   @action
   async loadTypes() {
-    let page = 1;
-    let pageCount = 0;
-    let result =
-      await this.apiClientStore.getPaginated<MtgCardSetDtoPaginatedRestResultObject>(
-        apiRoutes.CARDS.TYPES,
-        page
+    this.types = await this.apiClientStore.getPaginatedFull<MtgCardTypeDto>(
+      apiRoutes.CARDS.TYPES
+    );
+  }
+  @action
+  async loadRarities() {
+    this.rarities =
+      await this.apiClientStore.getPaginatedFull<MtgCardRarityDto>(
+        apiRoutes.CARDS.RARITIES
       );
-    this.types = result.result!;
-    pageCount = result.pageCount!;
+  }
 
-    while (page < pageCount) {
-      page++;
-      result =
-        await this.apiClientStore.getPaginated<MtgCardSetDtoPaginatedRestResultObject>(
-          apiRoutes.CARDS.TYPES,
-          page
-        );
-      this.types = this.colors!.concat(result.result!);
-    }
+  @action
+  async loadLanguages() {
+    this.languages =
+      await this.apiClientStore.getPaginatedFull<MtgCardLanguageDto>(
+        apiRoutes.CARDS.LANGUAGES
+      );
   }
 }
