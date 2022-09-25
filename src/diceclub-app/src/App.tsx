@@ -6,20 +6,22 @@ import { BrowserRouter } from "react-router-dom";
 import { Container } from "semantic-ui-react";
 import { NotifierComponent } from "./components/notifier";
 import { SetSelectComponent } from "./components/cards/set.select";
+import { LanguageSelectComponent } from "./components/cards/language.select";
 
 function App() {
-	return (
-		<StoreContext.Provider value={initialValues}>
-			<LoaderComponent>
-				<NotifierComponent />
-				<BrowserRouter>
-					<Container className="main-container">
-						<SetSelectComponent /> 
-					</Container>
-				</BrowserRouter>
-			</LoaderComponent>
-		</StoreContext.Provider>
-	);
+  return (
+    <StoreContext.Provider value={initialValues}>
+      <LoaderComponent>
+        <NotifierComponent />
+        <BrowserRouter>
+          <Container className="main-container">
+            <SetSelectComponent />
+            <LanguageSelectComponent />
+          </Container>
+        </BrowserRouter>
+      </LoaderComponent>
+    </StoreContext.Provider>
+  );
 }
 
 export default App;
