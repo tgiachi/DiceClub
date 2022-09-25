@@ -361,6 +361,9 @@ public class CardService : AbstractBaseService<CardService>
                 Logger.LogInformation("{Name} - {ManaCost} - total: {Mana} - [{Index}]", card.Name, card.ManaCost,
                     card.Cmc,
                     index);
+                await PublishEvent(NotificationEventBuilder.Create().ToUser(userId)
+                    .Type(NotificationEventType.Information).Title("Importing cards").Message($"Card {card.Name}")
+                    .Build());
             }
         }
         catch (Exception ex)

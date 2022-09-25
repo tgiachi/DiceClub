@@ -44,8 +44,8 @@ export interface DiceClubUserDto {
   serialId?: string | null;
 }
 
-export interface DiceClubUserDtoListPaginatedRestResultObject {
-  result?: DiceClubUserDto[][] | null;
+export interface DiceClubUserDtoPaginatedRestResultObject {
+  result?: DiceClubUserDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -107,8 +107,8 @@ export interface MtgCardColorDto {
   imageUrl?: string | null;
 }
 
-export interface MtgCardColorDtoListPaginatedRestResultObject {
-  result?: MtgCardColorDto[][] | null;
+export interface MtgCardColorDtoPaginatedRestResultObject {
+  result?: MtgCardColorDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -229,8 +229,8 @@ export interface MtgCardLanguageDto {
   code?: string | null;
 }
 
-export interface MtgCardLanguageDtoListPaginatedRestResultObject {
-  result?: MtgCardLanguageDto[][] | null;
+export interface MtgCardLanguageDtoPaginatedRestResultObject {
+  result?: MtgCardLanguageDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -265,8 +265,8 @@ export interface MtgCardLegalityDto {
   name?: string | null;
 }
 
-export interface MtgCardLegalityDtoListPaginatedRestResultObject {
-  result?: MtgCardLegalityDto[][] | null;
+export interface MtgCardLegalityDtoPaginatedRestResultObject {
+  result?: MtgCardLegalityDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -314,8 +314,8 @@ export interface MtgCardLegalityTypeDto {
   name?: string | null;
 }
 
-export interface MtgCardLegalityTypeDtoListPaginatedRestResultObject {
-  result?: MtgCardLegalityTypeDto[][] | null;
+export interface MtgCardLegalityTypeDtoPaginatedRestResultObject {
+  result?: MtgCardLegalityTypeDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -351,8 +351,8 @@ export interface MtgCardRarityDto {
   image?: string | null;
 }
 
-export interface MtgCardRarityDtoListPaginatedRestResultObject {
-  result?: MtgCardRarityDto[][] | null;
+export interface MtgCardRarityDtoPaginatedRestResultObject {
+  result?: MtgCardRarityDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -392,8 +392,8 @@ export interface MtgCardSetDto {
   cardCount?: number;
 }
 
-export interface MtgCardSetDtoListPaginatedRestResultObject {
-  result?: MtgCardSetDto[][] | null;
+export interface MtgCardSetDtoPaginatedRestResultObject {
+  result?: MtgCardSetDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -471,8 +471,8 @@ export interface MtgCardTypeDto {
   name?: string | null;
 }
 
-export interface MtgCardTypeDtoListPaginatedRestResultObject {
-  result?: MtgCardTypeDto[][] | null;
+export interface MtgCardTypeDtoPaginatedRestResultObject {
+  result?: MtgCardTypeDto[] | null;
   error?: string | null;
   haveError?: boolean;
 
@@ -572,7 +572,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MtgCardColorDtoListPaginatedRestResultObject;
+    export type ResponseBody = MtgCardColorDtoPaginatedRestResultObject;
   }
   /**
    * No description
@@ -670,7 +670,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MtgCardLanguageDtoListPaginatedRestResultObject;
+    export type ResponseBody = MtgCardLanguageDtoPaginatedRestResultObject;
   }
   /**
    * No description
@@ -740,7 +740,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MtgCardLegalityDtoListPaginatedRestResultObject;
+    export type ResponseBody = MtgCardLegalityDtoPaginatedRestResultObject;
   }
   /**
    * No description
@@ -810,7 +810,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MtgCardLegalityTypeDtoListPaginatedRestResultObject;
+    export type ResponseBody = MtgCardLegalityTypeDtoPaginatedRestResultObject;
   }
   /**
    * No description
@@ -908,7 +908,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MtgCardRarityDtoListPaginatedRestResultObject;
+    export type ResponseBody = MtgCardRarityDtoPaginatedRestResultObject;
   }
   /**
    * No description
@@ -978,7 +978,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MtgCardSetDtoListPaginatedRestResultObject;
+    export type ResponseBody = MtgCardSetDtoPaginatedRestResultObject;
   }
   /**
    * No description
@@ -1048,7 +1048,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MtgCardTypeDtoListPaginatedRestResultObject;
+    export type ResponseBody = MtgCardTypeDtoPaginatedRestResultObject;
   }
   /**
    * No description
@@ -1118,7 +1118,7 @@ export namespace Api {
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = DiceClubUserDtoListPaginatedRestResultObject;
+    export type ResponseBody = DiceClubUserDtoPaginatedRestResultObject;
   }
   /**
    * No description

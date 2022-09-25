@@ -5,6 +5,7 @@ import { apiConfig } from "../api_client/api.config";
 import { apiRoutes } from "../api_client/api.routes";
 import { INotificationWebSocket } from "../interfaces/websocket/notification.websocket";
 import { IBasePreloadStore } from "../interfaces/stores/store.interface";
+import { INotificationType } from "../interfaces/notification";
 
 export class WebSocketStore implements IBasePreloadStore {
 	rootStore: RootStore;
@@ -31,7 +32,8 @@ export class WebSocketStore implements IBasePreloadStore {
 			(data: INotificationWebSocket) => {
 				console.log(`notification received: ${JSON.stringify(data)}`);
 				this.rootStore.notificationsStore.addNotification({
-					message: "test",
+					title: data.title,
+					message: data.message,
 					category: "info",
 					type: "toast",
 				});

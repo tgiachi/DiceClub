@@ -38,12 +38,12 @@ public abstract class BaseCrudAuthController<TEntity, TDto, TDbContext> : BaseGr
     }
 
     [HttpGet]
-    public async Task<ActionResult<PaginatedRestResultObject<List<TDto>>>> FindAll(int page = 1, int pageSize = 30)
+    public async Task<ActionResult<PaginatedRestResultObject<TDto>>> FindAll(int page = 1, int pageSize = 30)
     {
         var useRoute = await UserCanUseRoute();
         if (!useRoute)
         {
-            return DoUnauthorizedPaged<List<TDto>>();
+            return DoUnauthorizedPaged<TDto>();
         }
 
         return Ok(await _restPaginatorService.Paginate<Guid, TEntity, TDto, AbstractDtoMapper<Guid, TEntity, TDto>>(

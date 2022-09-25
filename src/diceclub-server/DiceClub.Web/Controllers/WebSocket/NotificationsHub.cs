@@ -32,6 +32,6 @@ public class NotificationsHub : Hub, INotificationHandler<NotificationEvent>
             return _hubContext.Clients.All.SendAsync("notification", notification, cancellationToken);
         }
 
-        return _hubContext.Clients.User(notification.UserId.ToString()).SendAsync("notification", cancellationToken);
+        return _hubContext.Clients.User(notification.UserId.ToString()).SendAsync("notification", notification, cancellationToken);
     }
 }
