@@ -27,6 +27,7 @@ namespace DiceClub.Services.Paginator
             var totalCount = resultQueryObjects.Count();
             page = page < 1 ? 1 : page;
 
+            
             resultQueryObjects = resultQueryObjects.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
 
@@ -44,12 +45,17 @@ namespace DiceClub.Services.Paginator
             List<TEntity> resultQueryObjects,
             int page,
             int pageSize,
-            TDtoMapper mapper
+            TDtoMapper mapper,
+            long totalCount = 0
         ) where TEntity : IBaseEntity<TId>
             where TDto : IBaseDto<TId>
             where TDtoMapper : IDtoMapper<TId, TEntity, TDto>
         {
             var result = await Paginate<TId, TEntity>(resultQueryObjects, page, pageSize);
+            if (totalCount > 0)
+            {
+                result.Count = totalCount;
+            }
             return await PaginateToDto<TId, TEntity, TDto, TDtoMapper>(result, mapper);
         }
 

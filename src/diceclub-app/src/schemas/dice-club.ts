@@ -498,6 +498,10 @@ export interface MtgCardTypeDtoRestResultObject {
 export interface SearchCardRequest {
   description?: string | null;
   colors?: string[] | null;
+  sets?: string[] | null;
+  rarities?: string[] | null;
+  languages?: string[] | null;
+  types?: string[] | null;
   orderBy?: SearchCardRequestOrderBy;
 }
 

@@ -15,13 +15,13 @@ namespace DiceClub.Web.Controllers.Cards;
 [ApiVersion("1.0")]
 [Route("api/v1/[controller]")]
 [Authorize]
-public class CardController : BaseAuthController
+public class CardsController : BaseAuthController
 {
     private readonly MtgCardMapper _mtgCardMapper;
     private readonly CardService _cardService;
     private readonly RestPaginatorService _restPaginatorService;
 
-    public CardController(MtgCardMapper mtgCardMapper, CardService cardService,
+    public CardsController(MtgCardMapper mtgCardMapper, CardService cardService,
         RestPaginatorService restPaginatorService)
     {
         _mtgCardMapper = mtgCardMapper;
@@ -34,9 +34,14 @@ public class CardController : BaseAuthController
     public async Task<ActionResult<PaginatedRestResultObject<MtgCardDto>>> Search([FromBody] SearchCardRequest query,
         int page = 1, int pageSize = 30)
     {
-        var result = await _cardService.SearchCards(query, GetUserId());
+        var result = await _cardService.SearchCards(query, GetUserId(), page, pageSize);
 
-        return await _restPaginatorService.Paginate<Guid, MtgCardEntity, MtgCardDto, MtgCardMapper>(result, page,
-            pageSize, _mtgCardMapper);
+        return PaginatedRestResultObjectBuilder<MtgCardDto>.Create()
+            .Data(_mtgCardMapper.ToDto(result.Cards))
+            .Page(page)
+            .PageCount((int)Math.Ceiling((double)result.TotalCount / pageSize))
+            .PageSize(pageSize)
+            .Total(result.TotalCount)
+            .Build();
     }
 }

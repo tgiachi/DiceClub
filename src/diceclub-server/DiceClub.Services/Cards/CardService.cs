@@ -11,6 +11,7 @@ using DiceClub.Api.Data.Cards;
 using DiceClub.Database.Context;
 using DiceClub.Database.Dao.Cards;
 using DiceClub.Database.Entities.MtgCards;
+using DiceClub.Services.Data.Cards;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ScryfallApi.Client;
@@ -20,7 +21,9 @@ namespace DiceClub.Services.Cards;
 
 public class CardService : AbstractBaseService<CardService>
 {
+    private readonly string _scryfallBaseUrl = "https://api.scryfall.com/";
     private readonly ScryfallApiClient _scryfallApiClient;
+    private readonly DiceClubDbContext _diceClubDbContext;
     private readonly MtgDumpDao _mtgDumpDao;
     private readonly MtgCardDao _mtgCardDao;
     private readonly MtgCardLanguageDao _mtgCardLanguageDao;
@@ -30,8 +33,6 @@ public class CardService : AbstractBaseService<CardService>
     private readonly MtgCardLegalityDao _mtgCardLegalityDao;
     private readonly MtgCardLegalityTypeDao _mtgCardLegalityTypeDao;
     private readonly MtgCardLegalityRelDao _mtgCardLegalityRelDao;
-    private readonly string _scryfallBaseUrl = "https://api.scryfall.com/";
-
     private readonly MtgCardTypeDao _mtgCardTypeDao;
     private readonly MtgCardRarityDao _mtgCardRarityDao;
 
@@ -40,6 +41,7 @@ public class CardService : AbstractBaseService<CardService>
         MtgCardTypeDao mtgCardTypeDao, MtgCardDao mtgCardDao, MtgCardColorDao mtgCardColorDao,
         MtgCardSetDao mtgCardSetDao, MtgCardLanguageDao mtgCardLanguageDao, MtgCardColorRelDao mtgCardColorRelDao,
         MtgCardLegalityDao mtgCardLegalityDao, MtgCardLegalityTypeDao mtgCardLegalityTypeDao,
+        DiceClubDbContext diceClubDbContext,
         MtgCardLegalityRelDao mtgCardLegalityRelDao) : base(eventBusService,
         logger)
     {
@@ -54,13 +56,23 @@ public class CardService : AbstractBaseService<CardService>
         _mtgCardColorRelDao = mtgCardColorRelDao;
         _mtgCardLegalityDao = mtgCardLegalityDao;
         _mtgCardLegalityTypeDao = mtgCardLegalityTypeDao;
+        _diceClubDbContext = diceClubDbContext;
         _mtgCardLegalityRelDao = mtgCardLegalityRelDao;
     }
 
 
-    public async Task<List<MtgCardEntity>> SearchCards(SearchCardRequest request, Guid userId)
+    public async Task<SearchCardResultQuery> SearchCards(SearchCardRequest request, Guid userId, int page, int pageSize)
     {
         var colors = new List<Guid>();
+        var types = new List<Guid>();
+        var rarities = new List<Guid>();
+        var sets = new List<Guid>();
+        var languages = new List<Guid>();
+
+        if (request.OrderBy == null)
+        {
+            request.OrderBy = SearchCardRequestOrderBy.Name;
+        }
 
         if (request.Colors != null)
         {
@@ -74,71 +86,147 @@ public class CardService : AbstractBaseService<CardService>
             }
         }
 
-        var result = await _mtgCardDao.QueryAsList(entities =>
+        if (request.Sets != null)
         {
-            if (!string.IsNullOrEmpty(request.Description))
+            foreach (var s in request.Sets)
             {
-                entities = entities.Where(s => s.OwnerId == userId);
-
-                entities = entities.Where(s =>
-                    EF.Functions.ToTsVector("italian", s.Description)
-                        .Matches($"{request.Description}:*") ||
-                    EF.Functions.ToTsVector("italian", s.ForeignNames)
-                        .Matches($"{request.Description}:*") ||
-                    EF.Functions.ToTsVector("italian", s.Name)
-                        .Matches($"{request.Description}:*")
-                    
-                );
-
-                if (colors.Any())
+                var set = await _mtgCardSetDao.FindByCode(s);
+                if (set != null)
                 {
-                    entities = entities.Where(s => s.Colors.All(k => colors.Contains(k.ColorId)));
+                    sets.Add(set.Id);
                 }
             }
+        }
 
-            entities = entities
-                .Include(s => s.Colors)
-                .ThenInclude(s => s.Color)
-                .Include(s => s.Language)
-                .Include(s => s.Rarity)
-                .Include(s => s.Set)
-                .Include(s => s.Type)
-                .Include(s => s.Legalities);
-
-            if (request.OrderBy != null)
+        if (request.Types != null)
+        {
+            foreach (var t in request.Types)
             {
-                switch (request.OrderBy)
+                var type = await _mtgCardTypeDao.QueryAsSingle(entities =>
+                    entities.Where(s => s.Name.ToLower() == t.ToLower()));
+                if (type != null)
                 {
-                    case SearchCardRequestOrderBy.Name:
-                        entities = entities.OrderBy(s => s.Name);
-                        break;
-                    case SearchCardRequestOrderBy.Price:
-                        entities = entities.OrderBy(s => s.Price);
-                        break;
-                    case SearchCardRequestOrderBy.Set:
-                        entities = entities.OrderBy(s => s.SetId);
-                        break;
-                    case SearchCardRequestOrderBy.CreatedDate:
-                        entities = entities.OrderBy(s => s.CreateDateTime);
-                        break;
-                    case SearchCardRequestOrderBy.Rarity:
-                        entities = entities.OrderBy(s => s.RarityId);
-                        break;
-                    case SearchCardRequestOrderBy.CardType:
-                        entities = entities.OrderBy(s => s.TypeId);
-                        break;
-                    case SearchCardRequestOrderBy.Quantity:
-                        entities = entities.OrderBy(s => s.Quantity);
-                        break;
+                    types.Add(type.Id);
                 }
             }
+        }
 
-            entities = entities.AsSplitQuery();
-            return entities;
-        });
+        if (request.Rarities != null)
+        {
+            foreach (var r in request.Rarities)
+            {
+                var rarity =
+                    await _mtgCardRarityDao.QueryAsSingle(entities =>
+                        entities.Where(s => s.Name.ToLower() == r.ToLower()));
+                if (rarity != null)
+                {
+                    rarities.Add(rarity.Id);
+                }
+            }
+        }
+
+        if (request.Languages != null)
+        {
+            foreach (var l in request.Languages)
+            {
+                var language = await _mtgCardLanguageDao.QueryAsSingle(entities => entities.Where(k => k.Code == l));
+
+                if (language != null)
+                {
+                    languages.Add(language.Id);
+                }
+            }
+        }
+
+        var entities = _diceClubDbContext.MtgCards.AsQueryable();
+
+        entities = entities.Where(s => s.OwnerId == userId);
+
+        if (!string.IsNullOrEmpty(request.Description))
+        {
+            entities = entities.Where(s =>
+                EF.Functions.ToTsVector("italian", s.Description)
+                    .Matches($"{request.Description}:*") ||
+                EF.Functions.ToTsVector("italian", s.ForeignNames)
+                    .Matches($"{request.Description}:*") ||
+                EF.Functions.ToTsVector("italian", s.Name)
+                    .Matches($"{request.Description}:*")
+            );
+        }
+
+        if (sets.Any())
+        {
+            entities = entities.Where(entity => sets.Contains(entity.SetId));
+        }
+
+        if (colors.Any())
+        {
+            entities = entities.Where(s => s.Colors.All(k => colors.Contains(k.ColorId)));
+        }
+
+        if (types.Any())
+        {
+            entities = entities.Where(t => types.Contains(t.TypeId));
+        }
+
+        if (languages.Any())
+        {
+            entities = entities.Where(t => languages.Contains(t.LanguageId));
+        }
+
+        if (rarities.Any())
+        {
+            entities = entities.Where(t => rarities.Contains(t.RarityId));
+        }
+
+        entities = entities
+            .Include(s => s.Colors)
+            .ThenInclude(s => s.Color)
+            .Include(s => s.Language)
+            .Include(s => s.Rarity)
+            .Include(s => s.Set)
+            .Include(s => s.Type)
+            .Include(s => s.Legalities);
+
+        if (request.OrderBy != null)
+        {
+            switch (request.OrderBy)
+            {
+                case SearchCardRequestOrderBy.Name:
+                    entities = entities.OrderBy(s => s.Name);
+                    break;
+                case SearchCardRequestOrderBy.Price:
+                    entities = entities.OrderBy(s => s.Price);
+                    break;
+                case SearchCardRequestOrderBy.Set:
+                    entities = entities.OrderBy(s => s.SetId);
+                    break;
+                case SearchCardRequestOrderBy.CreatedDate:
+                    entities = entities.OrderBy(s => s.CreateDateTime);
+                    break;
+                case SearchCardRequestOrderBy.Rarity:
+                    entities = entities.OrderBy(s => s.RarityId);
+                    break;
+                case SearchCardRequestOrderBy.CardType:
+                    entities = entities.OrderBy(s => s.TypeId);
+                    break;
+                case SearchCardRequestOrderBy.Quantity:
+                    entities = entities.OrderBy(s => s.Quantity);
+                    break;
+            }
+        }
+
+        entities = entities.AsSplitQuery();
+        //Logger.LogInformation("Query: {Query}", entities.ToQueryString());
 
 
-        return result;
+        var resultQuery = new SearchCardResultQuery
+        {
+            Cards = await entities.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(),
+            TotalCount = await entities.CountAsync()
+        };
+
+        return resultQuery;
     }
 
     public async Task ImportCsv(string fileName, CardCsvImportType importFormat, Guid userId)

@@ -26,7 +26,6 @@ export const NotifierComponent = observer(() => {
 					toast(t.message);
 					return "";
 				})}
-			;
 		</div>
 	);
 });

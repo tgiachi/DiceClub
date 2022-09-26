@@ -1,27 +1,59 @@
-import "./App.css";
 import "semantic-ui-css/semantic.min.css";
 import { StoreContext, initialValues } from "./stores/store.context";
 import { LoaderComponent } from "./components/loader";
-import { BrowserRouter } from "react-router-dom";
-import { Container } from "semantic-ui-react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Container, Grid } from "semantic-ui-react";
 import { NotifierComponent } from "./components/notifier";
-import { SetSelectComponent } from "./components/cards/set.select";
-import { LanguageSelectComponent } from "./components/cards/language.select";
+import { LoginPage } from "./components/routes/login/login.page";
+import { DashboardPage } from "./components/routes/dashboard/dashboard.page";
+import { AuthenticatedRoute } from "./components/routes/authenticated.route";
+import { appRoutes } from "./components/routes/routes";
+import { NavBarComponent } from "./components/navbar/navbar";
+import { OwnedCardSearchPage } from "./components/routes/cards/owned/ownedcards.page";
+import "./App.css";
 
 function App() {
-  return (
-    <StoreContext.Provider value={initialValues}>
-      <LoaderComponent>
-        <NotifierComponent />
-        <BrowserRouter>
-          <Container className="main-container">
-            <SetSelectComponent />
-            <LanguageSelectComponent />
-          </Container>
-        </BrowserRouter>
-      </LoaderComponent>
-    </StoreContext.Provider>
-  );
+	return (
+		<StoreContext.Provider value={initialValues}>
+			<LoaderComponent>
+				<NotifierComponent />
+				<NavBarComponent />
+				<BrowserRouter>
+					<Grid container >
+						<Grid.Row>
+							<Grid.Column>
+								<Container className="main-container">
+									<Routes>
+										<Route
+											path={appRoutes.HOME}
+											element={
+												<AuthenticatedRoute>
+													<DashboardPage />
+												</AuthenticatedRoute>
+											}
+										/>
+										<Route path={appRoutes.AUTH} element={<LoginPage />} />
+										<Route
+											path={appRoutes.DASHBOARD}
+											element={
+												<AuthenticatedRoute>
+													<DashboardPage />
+												</AuthenticatedRoute>
+											}
+										/>
+										<Route
+											path={appRoutes.CARDS.OWNED_CARDS}
+											element={<OwnedCardSearchPage />}
+										/>
+									</Routes>
+								</Container>
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
+				</BrowserRouter>
+			</LoaderComponent>
+		</StoreContext.Provider>
+	);
 }
 
 export default App;

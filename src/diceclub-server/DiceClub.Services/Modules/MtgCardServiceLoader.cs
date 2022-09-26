@@ -24,6 +24,7 @@ namespace DiceClub.Services.Modules
             builder.RegisterType<MtgServiceProvider>().AsSelf().SingleInstance();
             builder.RegisterType<MtgCardService>().AsSelf().SingleInstance();
             builder.RegisterType<CardService>().AsSelf().SingleInstance();
+            builder.RegisterType<CardDeckService>().AsSelf().SingleInstance();
 
             base.Load(builder);
         }

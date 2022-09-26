@@ -11,11 +11,11 @@ export const LoaderComponent = observer(({ children }: { children: any }) => {
 	}, [rootStore.apiClient.isLoading]);
 
 	return (
-		<Container>
+		<>
 			<Dimmer active={isLoading}>
 				<Loader />
 			</Dimmer>
 			{children}
-		</Container>
+		</>
 	);
 });

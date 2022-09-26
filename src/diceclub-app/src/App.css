@@ -1,3 +1,7 @@
 .main-container {
 	margin-top: 50px;
 }
+.ui.label.img {
+  width: 16px;
+  height: 16px;
+}
