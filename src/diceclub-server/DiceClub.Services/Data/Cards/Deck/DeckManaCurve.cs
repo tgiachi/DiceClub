@@ -1,4 +1,4 @@
-﻿namespace DiceClub.Web.Data.Rest.Cards.Deck;
+﻿namespace DiceClub.Services.Data.Cards.Deck;
 
 public class DeckManaCurve
 {
