@@ -5,4 +5,7 @@ export const appRoutes = {
 	CARDS: {
 		OWNED_CARDS: "/cards/owned",
 	},
+	DECK: {
+		DECKS: "/cards/decks",
+	}
 };

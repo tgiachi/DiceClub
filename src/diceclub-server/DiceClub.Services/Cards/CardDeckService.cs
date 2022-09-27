@@ -1,11 +1,14 @@
 ﻿using Aurora.Api.Interfaces.Services;
 using Aurora.Api.Services.Base;
+using Dasync.Collections;
 using DiceClub.Api.Data.Cards;
 using DiceClub.Database.Dao.Cards;
 using DiceClub.Database.Dao.Cards.Deck;
+using DiceClub.Database.Dto.Cards.Deck;
 using DiceClub.Database.Entities.Deck;
 using DiceClub.Database.Entities.MtgCards;
 using DiceClub.Services.Data.Cards.Deck;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DiceClub.Services.Cards;
@@ -16,15 +19,20 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
     private readonly DeckMasterDao _deckMasterDao;
     private readonly DeckDetailDao _deckDetailDao;
     private readonly MtgCardTypeDao _mtgCardTypeDao;
+    private readonly MtgCardColorDao _mtgCardColorDao;
+    private readonly MtgCardColorRelDao _mtgCardColorRelDao;
 
     public CardDeckService(IEventBusService eventBusService, ILogger<CardDeckService> logger, CardService cardService,
-        DeckDetailDao deckDetailDao, DeckMasterDao deckMasterDao, MtgCardTypeDao mtgCardTypeDao) :
+        DeckDetailDao deckDetailDao, DeckMasterDao deckMasterDao, MtgCardTypeDao mtgCardTypeDao,
+        MtgCardColorDao mtgCardColorDao, MtgCardColorRelDao mtgCardColorRelDao) :
         base(eventBusService, logger)
     {
         _cardService = cardService;
         _deckDetailDao = deckDetailDao;
         _deckMasterDao = deckMasterDao;
         _mtgCardTypeDao = mtgCardTypeDao;
+        _mtgCardColorDao = mtgCardColorDao;
+        _mtgCardColorRelDao = mtgCardColorRelDao;
     }
 
     public List<DeckManaCurvePreset> GetManaCurvePresets()
@@ -71,6 +79,37 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
         };
     }
 
+    public async Task CreateMultipleRandomDeck(DeckMultipleDeckRequest request, Guid userId)
+    {
+        var random = new Random();
+        await PublishEvent(new NotificationEventBuilder().ToUser(userId).Title("Deck").Message("Starting deck creation")
+            .Build());
+
+        await Enumerable.Range(0, request.Count).ParallelForEachAsync(async i =>
+        {
+            var rndColors = new List<string>();
+            var numColors = random.Next(1, request.Colors.Count);
+            foreach (var _ in Enumerable.Range(0, numColors))
+            {
+                rndColors.Add(request.Colors[random.Next(rndColors.Count)]);
+            }
+            await CreateRandomDeck(new DeckCreateRequest
+            {
+                DeckName = "Random deck #" + i,
+                Colors = rndColors,
+                TotalCards = request.TotalCards,
+                TotalSideBoard = request.SideBoardTotalCards
+            }, userId);
+            
+            await PublishEvent(new NotificationEventBuilder().ToUser(userId).Title("Deck").Message($"Deck #{i} done")
+                .Build());
+
+        }, 1);
+        
+        await PublishEvent(new NotificationEventBuilder().ToUser(userId).Title("Deck").Message("Deck creation done")
+            .Build());
+    }
+
     public async Task CreateRandomDeck(DeckCreateRequest request, Guid userId, int pageSize = 100)
     {
         var rnd = new Random();
@@ -82,20 +121,27 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
         var maxCopyOfCard = 4;
         var landQuantity = rnd.Next(minLand, maxLand);
         var cardsRemaining = request.TotalCards - landQuantity;
-        var weights = await BuildWeights();
-        
+        var landCards = new Dictionary<string, string>()
+        {
+            { "W", "Plains" },
+            { "U", "Island" },
+            { "B", "Swamp" },
+            { "R", "Mountain" },
+            { "G", "Forest" }
+        };
+
+        var weightsBuilder = await BuildCardTypeWeights(cardsRemaining);
+
         if (request.ManaCurves == null)
         {
             request.ManaCurves = GetManaCurvePresets().FirstOrDefault(s => s.Name == "Default").ManaCurve;
         }
 
-        Mutate(5, weights);
-
         var searchRequest = new SearchCardRequest()
         {
             Colors = request.Colors
         };
-        
+
         var results = await _cardService.SearchCards(searchRequest, userId, page, pageSize);
 
         cards.AddRange(results.Cards);
@@ -107,125 +153,118 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
             cards.AddRange(results.Cards);
             page++;
         }
-        
+
         var deckMaster = await _deckMasterDao.Insert(new DeckMasterEntity
         {
             Name = request.DeckName,
             OwnerId = userId
         });
 
-        var distCardRemains = cardsRemaining;
-        foreach (var t in weights)
-        {
-            t.CardCount = (int)Math.Round(t.Weight * distCardRemains);
-            distCardRemains = cardsRemaining - t.CardCount;
-        }
-        var totalCards = weights.Sum(s => s.CardCount);
-        Logger.LogInformation("Total cards: {Total} adjusting size: {Result} ", totalCards, totalCards > cardsRemaining);
-
-        if (totalCards > cardsRemaining)
-        {
-            while (weights.Sum(s => s.CardCount) > cardsRemaining)
-            {
-                var removeNumCards = rnd.Next(1, 2);
-                var randomType = rnd.Next(weights.Count);
-                if (weights[randomType].CardCount > 0)
-                {
-                    weights[randomType].CardCount -= removeNumCards;
-                }
-            }
-        }
-
         var deckDetails = new List<DeckDetailEntity>();
-        
-        foreach (var w in weights)
+
+        foreach (var k in Enumerable.Range(0, cardsRemaining))
         {
-            var filteredCards = cards.Where(s => s.TypeId == w.Type.Id).ToList();
-            while (w.CardCount != 0)
-            {
-                var randomCard = filteredCards[rnd.Next(0, filteredCards.Count)];
-                if (deckDetails.Count(s => s.CardId == randomCard.Id) > maxCopyOfCard)
-                {
-                    continue;
-                }
-                deckDetails.Add(new DeckDetailEntity
-                {
-                    CardId = randomCard.Id,
-                    Quantity = 1,
-                    DeckMasterId = deckMaster.Id
-                });
-                w.CardCount--;
-            }
-        }
+            var w = weightsBuilder.PickAnItem();
+            var filteredCards = cards.Where(s => s.TypeId == w.CardType.Id).ToList();
 
-        await _deckDetailDao.InsertBulk(deckDetails);
-    }
-
-    public static void Mutate(int passes, List<DeckRandomCardData> weights)
-    {
-        var fudge = 0.33; // this adjusts our mutation amplitude
-        var totalWeights = weights.Select(s => s.Weight).ToList();
-        var rand = new Random();
-        for (int i = 0; i < passes; i++)
-        {
-            var rand_a = 0;
-            var rand_b = 0;
-            while (rand_a == rand_b)
-            {
-                rand_a = rand.Next(0, weights.Count - 1);
-                rand_b = rand.Next(0, weights.Count - 1);
-            }
-
-            var mutationMagnitude = (float)(rand.NextDouble() * totalWeights.Average() * fudge);
-            //Console.WriteLine("mutation magnitude = " + mutationMagnitude);
-            if (totalWeights[rand_a] - mutationMagnitude <= 0.1 || totalWeights[rand_b] + mutationMagnitude >= 0.90)
+            var randomCard = filteredCards[rnd.Next(0, filteredCards.Count)];
+            if (deckDetails.Count(s => s.CardId == randomCard.Id) > maxCopyOfCard)
             {
                 continue;
             }
 
-            totalWeights[rand_a] -= mutationMagnitude;
-            totalWeights[rand_b] += mutationMagnitude;
+            Logger.LogInformation("Adding card: {CardName} - {Type}", randomCard.Name, randomCard.Type.Name);
+            deckDetails.Add(new DeckDetailEntity
+            {
+                CardId = randomCard.Id,
+                Quantity = 1,
+                DeckMasterId = deckMaster.Id,
+                CardType = DeckDetailCardType.Main
+            });
         }
 
-        var idx = 0;
-        foreach (var w in weights)
+        await _deckDetailDao.InsertBulk(deckDetails);
+
+        foreach (var k in Enumerable.Range(0, request.TotalSideBoard))
         {
-            weights[idx].Weight = totalWeights[idx];
+            var randomType = weightsBuilder.PickAnItem();
+            var filteredCards = cards.Where(s => s.TypeId == randomType.CardType.Id).ToList();
+            var sideBoardCard = filteredCards[rnd.Next(filteredCards.Count)];
+
+            Logger.LogInformation("SideBoard - Adding card: {CardName} - {Type}", sideBoardCard.Name,
+                sideBoardCard.Type.Name);
+            await _deckDetailDao.Insert(new DeckDetailEntity
+            {
+                CardId = sideBoardCard.Id,
+                CardType = DeckDetailCardType.SideBoard,
+                Quantity = 1,
+                DeckMasterId = deckMaster.Id
+            });
+        }
+
+        var numOfLandColors = (int)Math.Round((double)landQuantity / request.Colors.Count);
+        foreach (var color in request.Colors)
+        {
+
+            var landOfColor = cards.FirstOrDefault(s => s.PrintedName.ToLower() == landCards[color].ToLower());
+
+            await _deckDetailDao.Insert(new DeckDetailEntity
+            {
+                CardId = landOfColor.Id,
+                DeckMasterId = deckMaster.Id,
+                CardType = DeckDetailCardType.Land,
+                Quantity = numOfLandColors
+            });
         }
     }
 
-    private async Task<List<DeckRandomCardData>> BuildWeights()
+    public Task<List<DeckMasterEntity>> FindDeckMasterByUserId(Guid userId)
     {
-        var rand = new Random();
-        var dict = new List<DeckRandomCardData>()
+        return _deckMasterDao.QueryAsList(entities => entities.Where(s => s.OwnerId == userId));
+    }
+
+    public Task<List<DeckDetailEntity>> FindDeckDetailById(Guid id, Guid userId)
+    {
+        return _deckDetailDao.QueryAsList(entities => entities
+            .Where(s => s.DeckMasterId == id && s.DeckMaster.OwnerId == userId)
+            .Include(k => k.DeckMaster)
+            .Include(k => k.Card)
+        );
+    }
+
+    public async Task<RandomWeightedPicker<WeightedCardType>> BuildCardTypeWeights(int totalCards)
+    {
+        var weighted = new List<WeightedCardType>()
         {
-            new ()
+            new()
             {
-                Type = await _mtgCardTypeDao.FindByName("Instant"),
-                Weight = 1.0 / rand.Next(2, 5),
+                CardType = await _mtgCardTypeDao.FindByName("Instant"),
+                Weight = (int)Math.Round(0.2 * totalCards)
             },
-            new ()
+            new()
             {
-                Type = await _mtgCardTypeDao.FindByName("Sorcery"),
-                Weight = 1.0 / rand.Next(2, 5),
+                CardType = await _mtgCardTypeDao.FindByName("Sorcery"),
+                Weight = (int)Math.Round(0.2 * totalCards)
             },
-            new ()
+            new()
             {
-                Type = await _mtgCardTypeDao.FindByName("Creature"),
-                Weight = 1.0 / 1
+                CardType = await _mtgCardTypeDao.FindByName("Creature"),
+                Weight = (int)Math.Round(0.3 * totalCards)
             },
-            new ()
+            new()
             {
-                Type = await _mtgCardTypeDao.FindByName("Enchantment"),
-                Weight = 1.0 / rand.Next(2, 5)
+                CardType = await _mtgCardTypeDao.FindByName("Enchantment"),
+                Weight = (int)Math.Round(0.1 * totalCards)
             },
-            new ()
+            new()
             {
-                Type = await _mtgCardTypeDao.FindByName("Artifact"),
-                Weight = 1.0 / rand.Next(2, 5)
+                CardType = await _mtgCardTypeDao.FindByName("Artifact"),
+                Weight = (int)Math.Round(0.2 * totalCards)
             }
         };
 
-        return dict;
+        return new RandomWeightedPicker<WeightedCardType>(weighted);
     }
+    
+    
 }

@@ -27,6 +27,116 @@ export interface CardStageAddRequest {
   isFoil?: boolean;
 }
 
+export interface DeckCreateRequest {
+  deckName?: string | null;
+  colors?: string[] | null;
+
+  /** @format int32 */
+  totalCards?: number;
+
+  /** @format int32 */
+  totalSideBoard?: number;
+  manaCurves?: DeckManaCurve[] | null;
+}
+
+export enum DeckDetailCardType {
+  Main = "Main",
+  Land = "Land",
+  SideBoard = "SideBoard",
+}
+
+export interface DeckDetailDto {
+  /** @format uuid */
+  id?: string;
+
+  /** @format date-time */
+  created?: string;
+
+  /** @format date-time */
+  updated?: string;
+
+  /** @format uuid */
+  deckMasterId?: string;
+
+  /** @format uuid */
+  cardId?: string;
+  card?: MtgCardDto;
+
+  /** @format int64 */
+  quantity?: number;
+  cardType?: DeckDetailCardType;
+}
+
+export interface DeckDetailDtoListRestResultObject {
+  result?: DeckDetailDto[] | null;
+  error?: string | null;
+  haveError?: boolean;
+}
+
+export interface DeckManaCurve {
+  /** @format int32 */
+  cmcCost?: number;
+
+  /** @format int32 */
+  count?: number;
+}
+
+export interface DeckManaCurvePreset {
+  name?: string | null;
+  manaCurve?: DeckManaCurve[] | null;
+}
+
+export interface DeckManaCurvePresetListRestResultObject {
+  result?: DeckManaCurvePreset[] | null;
+  error?: string | null;
+  haveError?: boolean;
+}
+
+export interface DeckMasterDto {
+  /** @format uuid */
+  id?: string;
+
+  /** @format date-time */
+  created?: string;
+
+  /** @format date-time */
+  updated?: string;
+  name?: string | null;
+
+  /** @format uuid */
+  ownerId?: string;
+}
+
+export interface DeckMasterDtoPaginatedRestResultObject {
+  result?: DeckMasterDto[] | null;
+  error?: string | null;
+  haveError?: boolean;
+
+  /** @format int32 */
+  pageSize?: number;
+
+  /** @format int32 */
+  page?: number;
+
+  /** @format int32 */
+  pageCount?: number;
+
+  /** @format int64 */
+  count?: number;
+}
+
+export interface DeckMultipleDeckRequest {
+  /** @format int32 */
+  count?: number;
+
+  /** @format int32 */
+  totalCards?: number;
+
+  /** @format int32 */
+  sideBoardTotalCards?: number;
+  colors?: string[] | null;
+}
+
 export interface DiceClubUserDto {
   /** @format uuid */
   id?: string;
@@ -524,12 +634,82 @@ export interface StringRestResultObject {
 export namespace Api {
   /**
    * No description
-   * @tags Card
-   * @name V1CardSearchCreate
-   * @request POST:/api/v1/card/search
+   * @tags CardDeck
+   * @name V1CardsDeckPresetManaCurvesList
+   * @request GET:/api/v1/cards/deck/preset/mana_curves
    * @secure
    */
-  export namespace V1CardSearchCreate {
+  export namespace V1CardsDeckPresetManaCurvesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DeckManaCurvePresetListRestResultObject;
+  }
+  /**
+   * No description
+   * @tags CardDeck
+   * @name V1CardsDeckRandomSingleDeckCreate
+   * @request POST:/api/v1/cards/deck/random/single/deck
+   * @secure
+   */
+  export namespace V1CardsDeckRandomSingleDeckCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = DeckCreateRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = BooleanRestResultObject;
+  }
+  /**
+   * No description
+   * @tags CardDeck
+   * @name V1CardsDeckRandomMultipleDeckCreate
+   * @request POST:/api/v1/cards/deck/random/multiple/deck
+   * @secure
+   */
+  export namespace V1CardsDeckRandomMultipleDeckCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = DeckMultipleDeckRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = BooleanRestResultObject;
+  }
+  /**
+   * No description
+   * @tags CardDeck
+   * @name V1CardsDeckList
+   * @request GET:/api/v1/cards/deck
+   * @secure
+   */
+  export namespace V1CardsDeckList {
+    export type RequestParams = {};
+    export type RequestQuery = { page?: number; pageSize?: number };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DeckMasterDtoPaginatedRestResultObject;
+  }
+  /**
+   * No description
+   * @tags CardDeck
+   * @name V1CardsDeckMasterDetail
+   * @request GET:/api/v1/cards/deck/master/{id}
+   * @secure
+   */
+  export namespace V1CardsDeckMasterDetail {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DeckDetailDtoListRestResultObject;
+  }
+  /**
+   * No description
+   * @tags Cards
+   * @name V1CardsSearchCreate
+   * @request POST:/api/v1/cards/search
+   * @secure
+   */
+  export namespace V1CardsSearchCreate {
     export type RequestParams = {};
     export type RequestQuery = { page?: number; pageSize?: number };
     export type RequestBody = SearchCardRequest;

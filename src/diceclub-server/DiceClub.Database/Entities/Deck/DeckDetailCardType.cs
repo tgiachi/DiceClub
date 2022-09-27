@@ -9,6 +9,7 @@ namespace DiceClub.Database.Entities.Deck
     public enum DeckDetailCardType
     {
         Main,
+        Land,
         SideBoard
     }
 }

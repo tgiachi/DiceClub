@@ -15,6 +15,9 @@ export const apiRoutes = {
 		LEGALITY_TYPES: "api/v1/cards/legality_type",
 		SEARCH: "api/v1/cards/search",
   },
+  DECK: {
+    DECKS: "api/v1/cards/deck",
+  },
   PAGINATION: {
     PAGE_SIZE: 50,
     buildPaginationQuery: (route: string, page: number, pageSize: number) => {

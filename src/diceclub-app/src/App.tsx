@@ -11,6 +11,7 @@ import { appRoutes } from "./components/routes/routes";
 import { NavBarComponent } from "./components/navbar/navbar";
 import { OwnedCardSearchPage } from "./components/routes/cards/owned/ownedcards.page";
 import "./App.css";
+import { DeckPage } from "./components/routes/deck/deck.page";
 
 function App() {
 	return (
@@ -19,7 +20,7 @@ function App() {
 				<NotifierComponent />
 				<NavBarComponent />
 				<BrowserRouter>
-					<Grid container >
+					<Grid container>
 						<Grid.Row>
 							<Grid.Column>
 								<Container className="main-container">
@@ -45,6 +46,7 @@ function App() {
 											path={appRoutes.CARDS.OWNED_CARDS}
 											element={<OwnedCardSearchPage />}
 										/>
+										<Route path={appRoutes.DECK.DECKS} element={<DeckPage />} />
 									</Routes>
 								</Container>
 							</Grid.Column>
