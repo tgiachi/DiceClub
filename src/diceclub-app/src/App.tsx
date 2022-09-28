@@ -19,8 +19,9 @@ function App() {
 		<StoreContext.Provider value={initialValues}>
 			<LoaderComponent>
 				<NotifierComponent />
-				<NavBarComponent />
+
 				<BrowserRouter>
+					<NavBarComponent />
 					<Grid container>
 						<Grid.Row>
 							<Grid.Column>
@@ -48,7 +49,10 @@ function App() {
 											element={<OwnedCardSearchPage />}
 										/>
 										<Route path={appRoutes.DECK.DECKS} element={<DeckPage />} />
-										<Route path={appRoutes.DECK.DECK_DETAIL} element={<DeckDetailPage />} />
+										<Route
+											path={appRoutes.DECK.DECK_DETAIL}
+											element={<DeckDetailPage />}
+										/>
 									</Routes>
 								</Container>
 							</Grid.Column>

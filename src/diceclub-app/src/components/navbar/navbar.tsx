@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { useStore } from "../../stores/store.context";
-import { Menu, Container, Dropdown, Image } from "semantic-ui-react";
+import { Menu, Container, Dropdown, Image, Label } from "semantic-ui-react";
+import { Link } from "react-router-dom";
+import { apiRoutes } from "../../api_client/api.routes";
+import { appRoutes } from "../routes/routes";
 
 export const NavBarComponent = observer(() => {
 	const { rootStore } = useStore();
@@ -28,12 +31,22 @@ export const NavBarComponent = observer(() => {
 							/>
 							Club del dado
 						</Menu.Item>
-						<Menu.Item as="a">Home</Menu.Item>
-						<Dropdown item simple text="Dropdown">
+						<Menu.Item as="a">
+							<Link to="/">Home</Link>
+						</Menu.Item>
+						<Dropdown item simple text="Carte">
 							<Dropdown.Menu>
-								<Dropdown.Item>List Item</Dropdown.Item>
-								<Dropdown.Item>List Item</Dropdown.Item>
-								<Dropdown.Divider />
+								<Dropdown.Item as ="a">
+									<Link  to={appRoutes.DECK.DECKS}>
+										<span className="text"><Label>Mazzi</Label></span>
+									</Link>
+								</Dropdown.Item>
+								<Dropdown.Item>
+									<Link to={appRoutes.CARDS.OWNED_CARDS}>
+										<span className="text">Carte</span>
+									</Link>
+								</Dropdown.Item>
+								{/* <Dropdown.Divider />
 								<Dropdown.Header>Header Item</Dropdown.Header>
 								<Dropdown.Item>
 									<i className="dropdown icon" />
@@ -43,7 +56,7 @@ export const NavBarComponent = observer(() => {
 										<Dropdown.Item>List Item</Dropdown.Item>
 									</Dropdown.Menu>
 								</Dropdown.Item>
-								<Dropdown.Item>List Item</Dropdown.Item>
+								<Dropdown.Item>List Item</Dropdown.Item> */}
 							</Dropdown.Menu>
 						</Dropdown>
 					</Container>

@@ -24,9 +24,7 @@ export const DeckDetailGrid = observer(
 		return (
 			<Grid celled columns={2}>
 				<Grid.Row></Grid.Row>
-				<Grid.Row>
-					<ManaCurveComponent cards={mainCards} />
-				</Grid.Row>
+			
 				<Grid.Row>
 					<Grid.Column width={3}>
 						<Grid.Row>

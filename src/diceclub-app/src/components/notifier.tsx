@@ -2,7 +2,9 @@ import { observer } from "mobx-react";
 import { useStore } from "../stores/store.context";
 import { INotification } from "../interfaces/notification";
 import React, { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import parser from "html-react-parser";
 
 export const NotifierComponent = observer(() => {
 	const { notificationsStore } = useStore().rootStore;
@@ -17,15 +19,22 @@ export const NotifierComponent = observer(() => {
 		}
 	}, [notificationsStore.getNotifications]);
 
+	useEffect(() => {
+		const filteredToasts = toasts.filter(
+			(t) => t.type == "toast" && !t.isShowed
+		);
+		filteredToasts.forEach((t) => {
+			toast(t.message, {
+				position: "top-right",
+				icon: "🦄",
+				progress: t.currentProgress,
+			});
+		});
+	}, [toasts]);
+
 	return (
 		<div>
-			<Toaster position="top-right" />
-			{toasts
-				.filter((s) => s.type === "toast")
-				.map((t) => {
-					toast(t.message);
-					return "";
-				})}
+			<ToastContainer position="top-right" newestOnTop />
 		</div>
 	);
 });

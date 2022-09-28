@@ -7,4 +7,7 @@ export interface INotification {
 	message: string;
 	category: INotificationCategory;
 	type: INotificationType;
+	isShowed: boolean;
+	currentProgress?: number;
+	maxProgress?: number;
 }

@@ -163,7 +163,7 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
             Name = request.DeckName,
             OwnerId = userId,
             CardCount = request.TotalCards + request.TotalSideBoard,
-            ColorIdentity = string.Join("", request.Colors),
+            ColorIdentity = string.Join("", request.Colors.Select(s => "{"+s+"}")),
             Format = DeckFormat.FreeForm
         });
 

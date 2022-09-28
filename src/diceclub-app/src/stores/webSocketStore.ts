@@ -30,12 +30,15 @@ export class WebSocketStore implements IBasePreloadStore {
 		notificationConnection.on(
 			"notification",
 			(data: INotificationWebSocket) => {
-				console.log(`notification received: ${JSON.stringify(data)}`);
+				console.log(`websocket notification received: ${JSON.stringify(data)}`);
 				this.rootStore.notificationsStore.addNotification({
 					title: data.title,
 					message: data.message,
 					category: "info",
 					type: "toast",
+					isShowed: false,
+					currentProgress: data.currentProgress,
+					maxProgress: data.maxProgress,
 				});
 			}
 		);

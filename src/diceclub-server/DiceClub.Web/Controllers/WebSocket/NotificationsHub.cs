@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using DiceClub.Database.Dao.Account;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -10,18 +11,22 @@ public class NotificationsHub : Hub, INotificationHandler<NotificationEvent>
 {
     private readonly ILogger _logger;
     private readonly IHubContext<NotificationsHub> _hubContext;
+    private DiceClubUserDao _diceClubUserDao;
 
-    public NotificationsHub(ILogger<NotificationsHub> logger, IHubContext<NotificationsHub> hubContext)
+    public NotificationsHub(ILogger<NotificationsHub> logger, IHubContext<NotificationsHub> hubContext, DiceClubUserDao diceClubUserDao)
     {
         _hubContext = hubContext;
+        _diceClubUserDao = diceClubUserDao;
         _logger = logger;
-        
     }
 
     public override async Task OnConnectedAsync()
     {
-        await _hubContext.Clients.All.SendAsync("notification",
-            new NotificationEvent { Message = "test", Title = "test", Type = NotificationEventType.Information, });
+        var userId = Context.User.Claims.ToList().FirstOrDefault(s => s.Type == "user_id").Value;
+        _logger.LogInformation("Connected userId: {Id}", userId);
+        var user = await _diceClubUserDao.FindById(new Guid(userId));
+        await Clients.Caller.SendAsync("notification",
+            new NotificationEvent { Message = $"Ciao <strong>{user.NickName}</strong>", Title = "Welcome", Type = NotificationEventType.Information, });
     }
 
     public Task Handle(NotificationEvent notification, CancellationToken cancellationToken)
