@@ -73,6 +73,11 @@ export interface DeckDetailDtoListRestResultObject {
   haveError?: boolean;
 }
 
+export enum DeckFormat {
+  Commander = "Commander",
+  FreeForm = "FreeForm",
+}
+
 export interface DeckManaCurve {
   /** @format int32 */
   cmcCost?: number;
@@ -105,6 +110,11 @@ export interface DeckMasterDto {
 
   /** @format uuid */
   ownerId?: string;
+  colorIdentity?: string | null;
+  format?: DeckFormat;
+
+  /** @format int32 */
+  cardCount?: number;
 }
 
 export interface DeckMasterDtoPaginatedRestResultObject {

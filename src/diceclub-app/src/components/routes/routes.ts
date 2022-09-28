@@ -7,5 +7,6 @@ export const appRoutes = {
 	},
 	DECK: {
 		DECKS: "/cards/decks",
+		DECK_DETAIL: "/cards/decks/:deckId",
 	}
 };

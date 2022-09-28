@@ -12,6 +12,7 @@ import { NavBarComponent } from "./components/navbar/navbar";
 import { OwnedCardSearchPage } from "./components/routes/cards/owned/ownedcards.page";
 import "./App.css";
 import { DeckPage } from "./components/routes/deck/deck.page";
+import { DeckDetailPage } from "./components/routes/deck/deck_detail.page";
 
 function App() {
 	return (
@@ -47,6 +48,7 @@ function App() {
 											element={<OwnedCardSearchPage />}
 										/>
 										<Route path={appRoutes.DECK.DECKS} element={<DeckPage />} />
+										<Route path={appRoutes.DECK.DECK_DETAIL} element={<DeckDetailPage />} />
 									</Routes>
 								</Container>
 							</Grid.Column>

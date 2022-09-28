@@ -84,15 +84,20 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
         var random = new Random();
         await PublishEvent(new NotificationEventBuilder().ToUser(userId).Title("Deck").Message("Starting deck creation")
             .Build());
+        
 
         await Enumerable.Range(0, request.Count).ParallelForEachAsync(async i =>
         {
             var rndColors = new List<string>();
-            var numColors = random.Next(1, request.Colors.Count);
+            var initialColors = new List<string>(request.Colors);
+            var numColors = random.Next(0, initialColors.Count)+1;
             foreach (var _ in Enumerable.Range(0, numColors))
             {
-                rndColors.Add(request.Colors[random.Next(rndColors.Count)]);
+                var cl = initialColors[random.Next(initialColors.Count)];
+                initialColors.Remove(cl);
+                rndColors.Add(cl);
             }
+
             await CreateRandomDeck(new DeckCreateRequest
             {
                 DeckName = "Random deck #" + i,
@@ -100,12 +105,11 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
                 TotalCards = request.TotalCards,
                 TotalSideBoard = request.SideBoardTotalCards
             }, userId);
-            
+
             await PublishEvent(new NotificationEventBuilder().ToUser(userId).Title("Deck").Message($"Deck #{i} done")
                 .Build());
-
         }, 1);
-        
+
         await PublishEvent(new NotificationEventBuilder().ToUser(userId).Title("Deck").Message("Deck creation done")
             .Build());
     }
@@ -157,7 +161,10 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
         var deckMaster = await _deckMasterDao.Insert(new DeckMasterEntity
         {
             Name = request.DeckName,
-            OwnerId = userId
+            OwnerId = userId,
+            CardCount = request.TotalCards + request.TotalSideBoard,
+            ColorIdentity = string.Join("", request.Colors),
+            Format = DeckFormat.FreeForm
         });
 
         var deckDetails = new List<DeckDetailEntity>();
@@ -205,7 +212,6 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
         var numOfLandColors = (int)Math.Round((double)landQuantity / request.Colors.Count);
         foreach (var color in request.Colors)
         {
-
             var landOfColor = cards.FirstOrDefault(s => s.PrintedName.ToLower() == landCards[color].ToLower());
 
             await _deckDetailDao.Insert(new DeckDetailEntity
@@ -229,6 +235,9 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
             .Where(s => s.DeckMasterId == id && s.DeckMaster.OwnerId == userId)
             .Include(k => k.DeckMaster)
             .Include(k => k.Card)
+            .ThenInclude(k => k.Type)
+            .Include(k => k.Card)
+            .ThenInclude(k => k.Set)
         );
     }
 
@@ -265,6 +274,4 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
 
         return new RandomWeightedPicker<WeightedCardType>(weighted);
     }
-    
-    
 }

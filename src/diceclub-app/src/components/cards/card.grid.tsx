@@ -9,6 +9,7 @@ import {
 } from "semantic-ui-react";
 import { CardItem } from "./card.item";
 import { useStore } from "../../stores/store.context";
+import { CardResultGrid } from "./search/cards.results";
 
 export const CardGrid = ({
 	cards,
@@ -31,11 +32,8 @@ export const CardGrid = ({
 					totalPages={rootStore.cardsStore.ownedCardSearchTotalPages}
 				/>
 			</Segment>
-			<Card.Group itemsPerRow={itemsPerRow}>
-				{cards.map((c) => {
-					return <CardItem key={c.id} card={c} />;
-				})}
-			</Card.Group>
+			<CardResultGrid cards={cards} itemsPerRow={itemsPerRow} />
+			
 		</Segment.Group>
 	);
 };

@@ -14,11 +14,24 @@ namespace DiceClub.Database.Entities.Deck
         [MaxLength(200)]
         public string Name { get; set; }
 
+        [MaxLength(30)]
+        public string ColorIdentity { get; set; }
+        
+        public DeckFormat Format { get; set; }
+        
         public virtual List<DeckDetailEntity> Details { get; set; }
+        
+        public int CardCount { get; set; }
 
         public Guid OwnerId { get; set; }
 
         public DiceClubUser Owner { get; set; }
 
+    }
+
+    public enum DeckFormat
+    {
+        Commander,
+        FreeForm,
     }
 }
