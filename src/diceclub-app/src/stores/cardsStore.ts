@@ -10,6 +10,7 @@ import {
 	MtgCardLegalityTypeDto,
 	MtgCardRarityDto,
 	MtgCardSetDto,
+	MtgCardSymbolDto,
 	MtgCardTypeDto,
 	SearchCardRequest,
 	SearchCardRequestOrderBy,
@@ -29,6 +30,7 @@ export class CardsStore implements IBasePreloadStore {
 	@observable legalities: MtgCardLegalityDto[] = [];
 	@observable legalityTypes: MtgCardLegalityTypeDto[] = [];
 	@observable searchOrderBy: string[] = [];
+	@observable symbols: MtgCardSymbolDto[] =[];
 
 	@observable ownedCardSearchQuery: SearchCardRequest = {};
 	@observable ownedCardSearchCurrentPage = 1;
@@ -50,6 +52,7 @@ export class CardsStore implements IBasePreloadStore {
 			this.loadLanguages(),
 			this.loadLegalities(),
 			this.loadLegalityTypes(),
+			this.loadSymbols(),
 			this.loadSearchOrderBy(),
 		]);
 		return Promise.resolve();
@@ -69,6 +72,13 @@ export class CardsStore implements IBasePreloadStore {
 	async loadSets() {
 		this.sets = await this.apiClientStore.getPaginatedFull<MtgCardSetDto>(
 			apiRoutes.CARDS.SETS
+		);
+	}
+
+	@action
+	async loadSymbols() {
+		this.symbols = await this.apiClientStore.getPaginatedFull<MtgCardSymbolDto>(
+			apiRoutes.CARDS.SYMBOLS
 		);
 	}
 

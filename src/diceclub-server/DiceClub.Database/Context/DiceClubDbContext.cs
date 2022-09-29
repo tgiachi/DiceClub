@@ -35,6 +35,7 @@ namespace DiceClub.Database.Context
         public DbSet<MtgCardTypeEntity> MtgCardTypes { get; set; }
         public DbSet<MtgDumpEntity> MtgDumpEntities { get; set; }
         public DbSet<MtgCardStageEntity> CardsStage { get; set; }
+        public DbSet<MtgCardSymbolEntity> MtgCardSymbols { get; set; }
 
         #endregion
 

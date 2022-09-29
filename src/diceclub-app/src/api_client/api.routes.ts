@@ -9,6 +9,7 @@ export const apiRoutes = {
     SETS: "api/v1/cards/sets",
 		COLORS: "api/v1/cards/colors",
 		TYPES: "api/v1/cards/types",
+    SYMBOLS: "api/v1/cards/symbols",
 		RARITIES: "api/v1/cards/rarities",
 		LANGUAGES: "api/v1/cards/languages",
 		LEGALITIES: "api/v1/cards/legalities",

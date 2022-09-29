@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Aurora.Api.Entities.Attributes;
 using Aurora.Api.Entities.Impl.Seeds;
 using Aurora.Api.Entities.Interfaces.Dao;
 using DiceClub.Api.Data.Mtg;
+using DiceClub.Api.Data.Mtg.Symbols;
 using DiceClub.Database.Dao.Cards;
 using DiceClub.Database.Entities.MtgCards;
 using Microsoft.Extensions.Logging;
@@ -24,6 +26,7 @@ namespace DiceClub.Services.DbSeeds
         private readonly MtgCardLegalityDao _mtgCardLegalityDao;
         private readonly MtgCardLegalityTypeDao _mtgCardLegalityTypeDao;
         private readonly MtgCardLanguageDao _mtgCardLanguageDao;
+        private readonly MtgCardSymbolDao _mtgCardSymbolDao;
 
         private readonly Dictionary<string, string> _colors = new()
         {
@@ -46,7 +49,7 @@ namespace DiceClub.Services.DbSeeds
         public MtgCardsDbSeed(MtgCardDao dao, ILogger<AbstractDbSeed<Guid, MtgCardEntity>> logger,
             MtgCardColorDao mtgCardColorDao, MtgCardSetDao mtgCardSetDao, MtgCardRarityDao mtgCardRarityDao,
             ScryfallApiClient scryfallApiClient, MtgCardLegalityDao mtgCardLegalityDao,
-            MtgCardLegalityTypeDao mtgCardLegalityTypeDao, MtgCardLanguageDao mtgCardLanguageDao) : base(dao, logger)
+            MtgCardLegalityTypeDao mtgCardLegalityTypeDao, MtgCardLanguageDao mtgCardLanguageDao, MtgCardSymbolDao mtgCardSymbolDao) : base(dao, logger)
         {
             _mtgCardColorDao = mtgCardColorDao;
             _mtgCardSetDao = mtgCardSetDao;
@@ -55,11 +58,13 @@ namespace DiceClub.Services.DbSeeds
             _mtgCardLegalityDao = mtgCardLegalityDao;
             _mtgCardLegalityTypeDao = mtgCardLegalityTypeDao;
             _mtgCardLanguageDao = mtgCardLanguageDao;
+            _mtgCardSymbolDao = mtgCardSymbolDao;
         }
 
         public override async Task<bool> Seed()
         {
             await CheckSets();
+            await CheckSymbols();
             await CheckColors();
             await CheckLegalities();
             await CheckLanguages();
@@ -103,6 +108,22 @@ namespace DiceClub.Services.DbSeeds
             foreach (var language in _languages)
             {
                 await _mtgCardLanguageDao.InsertIfNotExists(language.Key, language.Value);
+            }
+        }
+
+        private async Task CheckSymbols()
+        {
+            if ((await _mtgCardSymbolDao.Count()) == 0)
+            {
+                _logger.LogInformation("Download symbols");
+                using var httpClient = new HttpClient();
+                var results =  await httpClient.GetFromJsonAsync<MtgResultData<MtgSymbol>>("https://api.scryfall.com/symbology");
+
+                foreach (var s in results.Data)
+                {
+                    await _mtgCardSymbolDao.CreateIfNotExists(s.Symbol, s.Image, s.Description);
+                }
+                
             }
         }
     }

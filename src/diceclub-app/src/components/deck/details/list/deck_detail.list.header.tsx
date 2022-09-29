@@ -1,29 +1,59 @@
 import React from "react";
-import { Label, List } from "semantic-ui-react";
-import { MtgCardDto } from "../../../../schemas/dice-club";
+import {
+	Label,
+	List,
+	Popup,
+	Segment,
+	Image,
+	Grid,
+	Header,
+} from "semantic-ui-react";
+import { DeckDetailDto, MtgCardDto } from "../../../../schemas/dice-club";
+import { ColorImageComponent } from "../../../cards/color_image";
 
 export const DeckDetailListHeader = ({
 	title,
 	cards,
 }: {
 	title: string;
-	cards: MtgCardDto[];
+	cards: DeckDetailDto[];
 }) => {
 	return (
-		<List divided inverted relaxed>
-			<List.Header>
-				<Label>{title}</Label>
-			</List.Header>
-			{cards.map((s) => {
-			return (
-        <List.Item key={s.id}>
-        <List.Content>
-          <List.Header>Snickerdoodle</List.Header>
-          An excellent companion
-        </List.Content>
-      </List.Item>
-      )
-			})}
-		</List>
+		<Segment vertical>
+			<Label attached="top">
+				{title} ({cards.length})
+			</Label>
+			<List celled>
+				{cards.map((c) => {
+					return (
+						<List.Item key={c.id}>
+							<List.Content>
+								<Grid>
+									<Grid.Column width={3}>
+										<Grid.Row verticalAlign="middle">
+											<ColorImageComponent color={c.card!.manaCost!} />
+										</Grid.Row>
+									</Grid.Column>
+									<Grid.Column width={13}>
+										<Grid.Row verticalAlign="middle">
+											<Popup
+												trigger={<Header as={"h5"}> ({c.quantity})  {c.card!.name} </Header>}
+												content={
+													<Image
+														src={
+															c.card!.highResImageUrl || c.card!.lowResImageUrl
+														}
+													/>
+												}
+											/>
+										</Grid.Row>
+									</Grid.Column>
+								</Grid>
+							</List.Content>
+						</List.Item>
+					);
+				})}
+			</List>
+		</Segment>
 	);
 };

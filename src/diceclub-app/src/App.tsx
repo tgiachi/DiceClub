@@ -13,8 +13,10 @@ import { OwnedCardSearchPage } from "./components/routes/cards/owned/ownedcards.
 import "./App.css";
 import { DeckPage } from "./components/routes/deck/deck.page";
 import { DeckDetailPage } from "./components/routes/deck/deck_detail.page";
+import {  initLanguauge } from "./translations/i18n";
 
 function App() {
+	initLanguauge();
 	return (
 		<StoreContext.Provider value={initialValues}>
 			<LoaderComponent>

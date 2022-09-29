@@ -579,6 +579,44 @@ export interface MtgCardStageDtoPaginatedRestResultObject {
   count?: number;
 }
 
+export interface MtgCardSymbolDto {
+  /** @format uuid */
+  id?: string;
+
+  /** @format date-time */
+  created?: string;
+
+  /** @format date-time */
+  updated?: string;
+  symbol?: string | null;
+  description?: string | null;
+  image?: string | null;
+}
+
+export interface MtgCardSymbolDtoPaginatedRestResultObject {
+  result?: MtgCardSymbolDto[] | null;
+  error?: string | null;
+  haveError?: boolean;
+
+  /** @format int32 */
+  pageSize?: number;
+
+  /** @format int32 */
+  page?: number;
+
+  /** @format int32 */
+  pageCount?: number;
+
+  /** @format int64 */
+  count?: number;
+}
+
+export interface MtgCardSymbolDtoRestResultObject {
+  result?: MtgCardSymbolDto;
+  error?: string | null;
+  haveError?: boolean;
+}
+
 export interface MtgCardTypeDto {
   /** @format uuid */
   id?: string;
@@ -1224,6 +1262,76 @@ export namespace Api {
    * @secure
    */
   export namespace V1CardsSetsDelete {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = BooleanRestResultObject;
+  }
+  /**
+   * No description
+   * @tags Symbols
+   * @name V1SymbolsList
+   * @request GET:/api/v1/symbols
+   * @secure
+   */
+  export namespace V1SymbolsList {
+    export type RequestParams = {};
+    export type RequestQuery = { page?: number; pageSize?: number };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = MtgCardSymbolDtoPaginatedRestResultObject;
+  }
+  /**
+   * No description
+   * @tags Symbols
+   * @name V1SymbolsCreate
+   * @request POST:/api/v1/symbols
+   * @secure
+   */
+  export namespace V1SymbolsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = MtgCardSymbolDto;
+    export type RequestHeaders = {};
+    export type ResponseBody = MtgCardSymbolDtoRestResultObject;
+  }
+  /**
+   * No description
+   * @tags Symbols
+   * @name V1SymbolsPartialUpdate
+   * @request PATCH:/api/v1/symbols
+   * @secure
+   */
+  export namespace V1SymbolsPartialUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = MtgCardSymbolDto;
+    export type RequestHeaders = {};
+    export type ResponseBody = MtgCardSymbolDtoRestResultObject;
+  }
+  /**
+   * No description
+   * @tags Symbols
+   * @name V1SymbolsDetail
+   * @request GET:/api/v1/symbols/{id}
+   * @secure
+   */
+  export namespace V1SymbolsDetail {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = MtgCardSymbolDtoRestResultObject;
+  }
+  /**
+   * No description
+   * @tags Symbols
+   * @name V1SymbolsDelete
+   * @request DELETE:/api/v1/symbols/{id}
+   * @secure
+   */
+  export namespace V1SymbolsDelete {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;

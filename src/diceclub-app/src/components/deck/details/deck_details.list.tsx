@@ -4,17 +4,16 @@ import { DeckDetailDto, MtgCardDto } from "../../../schemas/dice-club";
 import { DeckDetailListHeader } from "./list/deck_detail.list.header";
 
 export const DeckDetailList = ({ details }: { details: DeckDetailDto[] }) => {
-	const cards = details.filter((d) => d.card !== null).map((d) => d.card!);
+	const cards = details.filter((d) => d.card !== null);
 	const groupedByType = cards.reduce<Map<string, MtgCardDto[]>>(
-		(acc: Map<string, MtgCardDto[]>, card: MtgCardDto) => {
-			const type = card.type?.name!;
+		(acc: Map<string, DeckDetailDto[]>, card: DeckDetailDto) => {
+			const type = card.card!.type?.name!;
 			if (!acc.get(type)) acc.set(type, []);
 			acc.set(type, [...acc.get(type)!, card!]);
 			return acc;
 		},
 		new Map<string, []>()
 	);
-	console.log(groupedByType);
 
 	return (
 		<>

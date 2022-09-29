@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "../../stores/store.context";
 import { Image } from "semantic-ui-react";
+import { v4 } from "uuid";
 
 const regex = /\{(.*?)\}/gm;
 export const ColorImageComponent = ({ color }: { color: string }) => {
@@ -16,23 +17,25 @@ export const ColorImageComponent = ({ color }: { color: string }) => {
 			if (m.index === regex.lastIndex) {
 				regex.lastIndex++;
 			}
+
 			m.forEach((match, groupIndex) => {
-				if (!match.startsWith("{")) {
+				if (match.startsWith("{")) {
 					wColors.push(match);
 				}
 			});
+      
 			setColors(wColors);
 		}
 	}, []);
 
 	return (
-		<Image.Group>
+		<Image.Group size="mini">
 			{colors.map((c) => {
+        const symbol = cardsStore.symbols?.filter((k) => k.symbol! == c)[0];
 				return (
 					<Image
-						size="mini"
-						key={c}
-						src={cardsStore.colors?.filter((k) => k.name! == c)[0].imageUrl}
+						key={symbol.id! + symbol.description + v4() }
+						src={symbol?.image!}
 					/>
 				);
 			})}

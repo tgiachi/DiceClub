@@ -7,7 +7,7 @@ import {
 	Pagination,
 	Grid,
 } from "semantic-ui-react";
-import { CardItem } from "./card.item";
+
 import { useStore } from "../../stores/store.context";
 import { CardResultGrid } from "./search/cards.results";
 
@@ -22,18 +22,22 @@ export const CardGrid = ({
 
 	return (
 		<Segment.Group>
-			<Segment>
-				<Pagination
-					onPageChange={(e, data) => {
-						rootStore.cardsStore.goToPageOwnedCardSearch(
-							data.activePage as number
-						);
-					}}
-					totalPages={rootStore.cardsStore.ownedCardSearchTotalPages}
-				/>
-			</Segment>
+			{cards.length > 0 ? (
+				<Segment>
+					<Pagination
+						onPageChange={(e, data) => {
+							rootStore.cardsStore.goToPageOwnedCardSearch(
+								data.activePage as number
+							);
+						}}
+						totalPages={rootStore.cardsStore.ownedCardSearchTotalPages}
+					/>
+				</Segment>
+			) : (
+				<></>
+			)}
+
 			<CardResultGrid cards={cards} itemsPerRow={itemsPerRow} />
-			
 		</Segment.Group>
 	);
 };
