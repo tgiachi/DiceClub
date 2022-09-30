@@ -4,6 +4,7 @@ import { useStore } from "../../../stores/store.context";
 
 import { Select } from "semantic-ui-react";
 import { MtgCardTypeDto } from "../../../schemas/dice-club";
+import { t } from "i18next";
 
 export const TypesSelectComponent = observer(
 	({
@@ -27,7 +28,7 @@ export const TypesSelectComponent = observer(
 
 		return (
 			<Select
-				placeholder="Select Type"
+				placeholder={t("cards.select_type.title")}
 				fluid
 				multiple={multiselect}
 				search

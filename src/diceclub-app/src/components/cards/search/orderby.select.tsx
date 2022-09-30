@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { useStore } from "../../../stores/store.context";
 import { Select } from "semantic-ui-react";
+import { t } from "i18next";
 export const CardSearchOrderBySelect = observer(
 	({
 		multiselect = false,
@@ -18,8 +19,7 @@ export const CardSearchOrderBySelect = observer(
 
 		return (
 			<Select
-      placeholder="Seleziona ordinamento"
-
+      placeholder={t("cards.select_order_by.title")}
 				onChange={(e, data) => {
 					callback(data.value as string);
 				}}

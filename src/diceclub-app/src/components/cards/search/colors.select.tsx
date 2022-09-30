@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { Select } from "semantic-ui-react";
-
+import { t } from "i18next";
 import { useStore } from "../../../stores/store.context";
 
 export const CardColorSelect = observer(
@@ -20,7 +20,7 @@ export const CardColorSelect = observer(
 		}, [rootStore.cardsStore.colors]);
 		return (
 			<Select
-				placeholder="Select color"
+				placeholder={t("cards.select_color.title")}
 				multiple={multiselect}
 				onChange={(e, data) => {
 					callback(data.value as string[]);

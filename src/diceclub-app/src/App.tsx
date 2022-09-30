@@ -13,7 +13,8 @@ import { OwnedCardSearchPage } from "./components/routes/cards/owned/ownedcards.
 import "./App.css";
 import { DeckPage } from "./components/routes/deck/deck.page";
 import { DeckDetailPage } from "./components/routes/deck/deck_detail.page";
-import {  initLanguauge } from "./translations/i18n";
+import { initLanguauge } from "./translations/i18n";
+import { DeckAiPage } from "./components/routes/deck/ai/deck_ai.page";
 
 function App() {
 	initLanguauge();
@@ -50,10 +51,29 @@ function App() {
 											path={appRoutes.CARDS.OWNED_CARDS}
 											element={<OwnedCardSearchPage />}
 										/>
-										<Route path={appRoutes.DECK.DECKS} element={<DeckPage />} />
+										<Route
+											path={appRoutes.DECK.DECKS}
+											element={
+												<AuthenticatedRoute>
+													<DeckPage />
+												</AuthenticatedRoute>
+											}
+										/>
 										<Route
 											path={appRoutes.DECK.DECK_DETAIL}
-											element={<DeckDetailPage />}
+											element={
+												<AuthenticatedRoute>
+													<DeckDetailPage />
+												</AuthenticatedRoute>
+											}
+										/>
+										<Route
+											path={appRoutes.DECK.DECK_AI}
+											element={
+												<AuthenticatedRoute>
+													<DeckAiPage />
+												</AuthenticatedRoute>
+											}
 										/>
 									</Routes>
 								</Container>

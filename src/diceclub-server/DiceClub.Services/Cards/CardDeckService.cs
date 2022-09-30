@@ -143,7 +143,8 @@ public class CardDeckService : AbstractBaseService<CardDeckService>
 
         var searchRequest = new SearchCardRequest()
         {
-            Colors = request.Colors
+            Colors = request.Colors,
+            Description = request.Keyword
         };
 
         var results = await _cardService.SearchCards(searchRequest, userId, page, pageSize);

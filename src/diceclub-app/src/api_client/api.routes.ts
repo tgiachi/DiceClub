@@ -18,6 +18,7 @@ export const apiRoutes = {
   },
   DECK: {
     DECKS: "api/v1/cards/deck",
+    MULTIPLE_DECK: "api/v1/cards/deck/random/multiple/deck",
   },
   PAGINATION: {
     PAGE_SIZE: 50,

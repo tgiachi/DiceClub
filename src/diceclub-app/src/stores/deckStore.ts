@@ -6,6 +6,7 @@ import {
 	DeckDetailDtoListRestResultObject,
 	DeckMasterDto,
 	DeckMasterDtoPaginatedRestResultObject,
+	DeckMultipleDeckRequest,
 } from "../schemas/dice-club";
 import { apiRoutes } from "../api_client/api.routes";
 
@@ -19,8 +20,15 @@ export class DeckStore {
 	selectedDeckMaster: DeckMasterDto | null = null;
 	@observable
 	deckDetails: DeckDetailDto[] = [];
-  @observable
-  viewListSelection: boolean = false;
+	@observable
+	viewListSelection: boolean = false;
+
+	@observable
+	multipleDeckQuery: DeckMultipleDeckRequest = {
+		count: 10,
+		sideBoardTotalCards: 12,
+		totalCards: 60,
+	};
 
 	constructor(rootStore: RootStore) {
 		this.rootStore = rootStore;
@@ -28,17 +36,22 @@ export class DeckStore {
 		makeAutoObservable(this);
 	}
 
-  @action
-  toggleViewListSelection(value: boolean) { 
-    this.viewListSelection = value;
-  }
+	@action
+	setMultipleDeckQuery(query: DeckMultipleDeckRequest) {
+		this.multipleDeckQuery = { ...this.multipleDeckQuery, ...query };
+	}
+
+	@action
+	toggleViewListSelection(value: boolean) {
+		this.viewListSelection = value;
+	}
 
 	@action
 	async selectDeckMaster(deckId: string) {
-    if (this.decks.length === 0) {
-      await this.getDecksMaster();
-    }
-		this.selectedDeckMaster = this.decks.find((d) => d.id === deckId)!;	
+		if (this.decks.length === 0) {
+			await this.getDecksMaster();
+		}
+		this.selectedDeckMaster = this.decks.find((d) => d.id === deckId)!;
 	}
 
 	@action
@@ -57,5 +70,11 @@ export class DeckStore {
 				apiRoutes.DECK.DECKS + "/master/" + deckId
 			);
 		this.deckDetails = result.result!;
+	}
+	async createMultipleDecks() {
+		await this.apiClientStore.post(
+			apiRoutes.DECK.MULTIPLE_DECK,
+			this.multipleDeckQuery
+		);
 	}
 }

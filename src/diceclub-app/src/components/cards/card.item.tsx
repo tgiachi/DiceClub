@@ -1,6 +1,7 @@
 import React from "react";
-import { Card, Header, Image, Label } from "semantic-ui-react";
+import { Card, Grid, Header, Image, Label } from "semantic-ui-react";
 import { MtgCardDto } from "../../schemas/dice-club";
+import { CardDescriptionSymbol } from "./card.description.symbol";
 
 export const CardItem = ({
 	card,
@@ -22,22 +23,39 @@ export const CardItem = ({
 			/>
 			<Card.Content>
 				<Card.Header>
-					<Header as="h4" textAlign="center"> {card.name}</Header>
+					<Header as="h4" textAlign="center">
+						{card.name}
+					</Header>
 				</Card.Header>
 				<Card.Meta>
-					<Header as="h5" textAlign="center" > {card.type?.name}</Header>
+					<Header as="h5" textAlign="center" style={{ fontStyle: "italic" }}>
+						{card.type?.name}
+					</Header>
 				</Card.Meta>
 				{showDetails ? (
-					<Card.Description>{card.description}</Card.Description>
+					<Card.Description>
+						<CardDescriptionSymbol description={card.description!} />{" "}
+					</Card.Description>
 				) : null}
 			</Card.Content>
 
 			{showDetails ? (
 				<Card.Content extra>
-					<Label>
-						<Image floated="left" size="mini" src={card.set?.image!} />
-						{card.set?.description}
-					</Label>
+					<Grid>
+						<Grid.Row>
+							<Grid.Column width={3}>
+								<Header as="h3" textAlign="center">
+									<Image floated="left" size="small" src={card.set?.image!} />
+								</Header>
+							</Grid.Column>
+							<Grid.Column width={12}>
+								<Header as="h6" textAlign="left">
+									{card.set?.description}
+								</Header>
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
+
 					{/* <UserLabel id={card.ownerId!} /> */}
 				</Card.Content>
 			) : null}

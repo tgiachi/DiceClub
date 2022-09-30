@@ -5,6 +5,7 @@ import { observer } from "mobx-react";
 import { useStore } from "../../../stores/store.context";
 import { MtgCardSetDto } from "../../../schemas/dice-club";
 import { Select } from "semantic-ui-react";
+import { t } from "i18next";
 
 export const SetSelectComponent = observer(
 	({
@@ -28,7 +29,7 @@ export const SetSelectComponent = observer(
 
 		return (
 			<Select
-				placeholder="Select Set"
+				placeholder={t("cards.select_set.title")}
 				fluid
 				multiple
 				search

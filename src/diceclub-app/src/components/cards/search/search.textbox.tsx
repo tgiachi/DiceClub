@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { Input } from "semantic-ui-react";
 import { useStore } from "../../../stores/store.context";
+import { t } from "i18next";
 
 export const CardSearchTextbox = observer(
 	({ callback }: { callback: (text: string) => void }) => {
@@ -22,7 +23,7 @@ export const CardSearchTextbox = observer(
 				icon="search"
 				fluid
 				iconPosition="left"
-				placeholder="Ricerca..."
+				placeholder={t("search")}
 			/>
 		);
 	}

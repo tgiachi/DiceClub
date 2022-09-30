@@ -2,6 +2,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { useStore } from "../../../stores/store.context";
 import { Select } from "semantic-ui-react";
+import { t } from "i18next";
 
 export const RaritiesSelect = observer(
 	({
@@ -29,7 +30,7 @@ export const RaritiesSelect = observer(
 		return (
 			<Select
 				fluid
-				placeholder="Select rarity"
+				placeholder={t("cards.select_rarity.title")}
 				multiple={multiselect}
 				search
 				clearable

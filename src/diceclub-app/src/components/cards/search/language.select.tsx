@@ -6,6 +6,7 @@ import { useStore } from "../../../stores/store.context";
 
 import { Select } from "semantic-ui-react";
 import { MtgCardLanguageDto } from "../../../schemas/dice-club";
+import { t } from "i18next";
 
 export const LanguageSelectComponent = observer(
 	({
@@ -30,7 +31,7 @@ export const LanguageSelectComponent = observer(
 
 		return (
 			<Select
-			  placeholder="Select Language"
+			  placeholder={t("cards.select_language.title")}
 				fluid
 				multiple={multiselect}
 				search
