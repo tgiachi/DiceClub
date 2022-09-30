@@ -12,6 +12,7 @@ import {
 	Image,
 } from "semantic-ui-react";
 import { Navigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const LoginPage = observer(() => {
 	const [logged, setLogged] = useState(false);
@@ -21,7 +22,7 @@ export const LoginPage = observer(() => {
 	} as { email?: string; password?: string });
 	const { rootStore } = useStore();
 	const location = useLocation();
-
+	const { t } = useTranslation();
 	useEffect(() => {
 		setLogged(rootStore.apiClient.isAutheticated);
 		if (rootStore.apiClient.isAutheticated) {
@@ -43,14 +44,13 @@ export const LoginPage = observer(() => {
 				<Grid.Column style={{ maxWidth: 450 }}>
 					<Segment inverted>
 						<Header as="h2" color="teal" textAlign="center">
-							<Image src="/logo.png" /> Log-in to your account
+							<Image size="mini" src="/logo.png" /> {t("login.title")}
 						</Header>
 					</Segment>
 					<Form
 						size="large"
 						onSubmit={async (f) => {
 							if (rememberMe) {
-								console.log("setting email");
 								localStorage.setItem("email", loginData.email!);
 							}
 							const result = await rootStore.apiClient.login(
