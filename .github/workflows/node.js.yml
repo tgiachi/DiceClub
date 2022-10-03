@@ -31,7 +31,6 @@ jobs:
     - run: |
        mkdir build
        ls -l
-       cp ./dist/* -Rf src/diceclub-server/DiceClub.Web/wwwroot
        cd src/diceclub-server
        dotnet restore
        dotnet build "DiceClub.Web/DiceClub.Web.csproj" -c Release -o ../build
@@ -42,7 +41,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: |
-        mkdir dist
         cd src/diceclub-app/
         npm i
         npx vite build --outDir ../../build/wwwroot/
