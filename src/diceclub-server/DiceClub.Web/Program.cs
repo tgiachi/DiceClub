@@ -46,7 +46,7 @@ namespace DiceClub.Web
             else
             {
                 logConfig = logConfig.MinimumLevel.Debug()
-                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Debug)
+                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Error)
                     .WriteTo.Console(new JsonFormatter(renderMessage: true));
             }
 
