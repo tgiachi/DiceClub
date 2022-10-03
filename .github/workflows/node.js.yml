@@ -34,7 +34,3 @@ jobs:
       run: npm i
     - name: Building frontend
     - run: npx vite build --outDire ../dist
-    - uses: actions/cache@v3
-      with:
-        path: ../dist
-        key: dist
