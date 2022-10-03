@@ -31,11 +31,3 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: Create out dir
-      run: mkdir dist
-    - name: Go to frontend directory
-      run: cd src/diceclub-app
-    - name: Install deps
-      run: npm i
-    - name: Building frontend
-    - run: npx vite build --outDire ../dist
