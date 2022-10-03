@@ -44,7 +44,7 @@ jobs:
        cp ./dist/* -Rf src/diceclub-server/DiceClub.Web/wwwroot
        cd src/diceclub-server
        dotnet restore
-       dotnet build "DiceClub.Web/DiceClub.WeB.csproj" -c Release -o ../build
+       dotnet build "DiceClub.Web/DiceClub.Web.csproj" -c Release -o ../build
 
    
      
