@@ -16,7 +16,7 @@ namespace DiceClub.Services.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<QueueService>().AsSelf().SingleInstance().AutoActivate();
+          //  builder.RegisterType<QueueService>().AsSelf().SingleInstance().AutoActivate();
             builder.RegisterType<RestPaginatorService>().AsSelf().SingleInstance();
             builder.RegisterType<CardStageService>().AsSelf().SingleInstance();
             base.Load(builder);

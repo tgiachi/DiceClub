@@ -69,7 +69,7 @@ namespace DiceClub.Web
                     .AddDbSeedService()
                     .AddTaskQueueService();
 
-                containerBuilder.RegisterEasyNetQ(builder.Configuration.GetSection("MQ")["Host"]);
+              //  containerBuilder.RegisterEasyNetQ(builder.Configuration.GetSection("MQ")["Host"]);
 
                 if (builder.Environment.IsDevelopment())
                 {
