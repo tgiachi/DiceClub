@@ -1,0 +1,5 @@
+{
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-action.json": "file:///c%3A/Users/squid/Projects/Personal/DiceClub/.github/workflows/node.js.yml"
+  }
+}
