@@ -50,6 +50,7 @@ jobs:
      uses: actions/setup-dotnet@v3.0.0
    - run: |
       mkdir build
+      ls -l
       cd src/diceclub-server
       cp ../../dist/* -Rf diceclub-server/DiceClub.Web/wwwroot
       dotnet restore
