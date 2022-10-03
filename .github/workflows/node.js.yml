@@ -31,5 +31,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: cd src/diceclub-app
     - run: npm i 
+    - working-directory: ./scr/diceclub-app
