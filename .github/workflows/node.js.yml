@@ -41,8 +41,8 @@ jobs:
     - run: |
        mkdir build
        ls -l
+       cp ./dist/* -Rf src/diceclub-server/DiceClub.Web/wwwroot
        cd src/diceclub-server
-       cp ../../dist/* -Rf diceclub-server/DiceClub.Web/wwwroot
        dotnet restore
        dotnet build "DiceClub.Web/DiceClub.WeB.csproj" -c Release -o ../build
 
