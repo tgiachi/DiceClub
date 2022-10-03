@@ -26,16 +26,6 @@ jobs:
         # An explicit key for restoring and saving the cache
         key: dist
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: |
-        mkdir dist
-        cd src/diceclub-app/
-        npm i
-        npx vite build --outDir ../../dist
     - name: Build .NET
       uses: actions/setup-dotnet@v3.0.0
     - run: |
@@ -45,6 +35,17 @@ jobs:
        cd src/diceclub-server
        dotnet restore
        dotnet build "DiceClub.Web/DiceClub.Web.csproj" -c Release -o ../build
+           - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: |
+        mkdir dist
+        cd src/diceclub-app/
+        npm i
+        npx vite build --outDir ../../build/wwwroot/
 
    
      
