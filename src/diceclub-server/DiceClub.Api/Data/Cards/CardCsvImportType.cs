@@ -2,5 +2,6 @@
 
 public enum CardCsvImportType
 {
-    CardCastle
+    CardCastle,
+    HelVaultPro
 }

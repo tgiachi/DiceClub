@@ -44,4 +44,16 @@ public class ImportController : BaseAuthController
         await _cardService.ImportCsv(tmpFile, CardCsvImportType.CardCastle ,GetUserId());
         return RestResultObjectBuilder<string>.Create().Data("queued").Build();
     }
+    
+    [HttpPost]
+    [Route("format/helvault")]
+    public async Task<ActionResult<RestResultObject<string>>> UploadHelvaultCsv(IFormFile file)
+    {
+        using var ms = new MemoryStream();
+        var tmpFile = Path.Join(Path.GetTempPath(), file.FileName);
+        await file.CopyToAsync(ms);
+        await System.IO.File.WriteAllBytesAsync(tmpFile, ms.ToArray());
+        await _cardService.ImportCsv(tmpFile, CardCsvImportType.HelVaultPro ,GetUserId());
+        return RestResultObjectBuilder<string>.Create().Data("queued").Build();
+    }
 }

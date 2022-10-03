@@ -43,13 +43,15 @@ namespace DiceClub.Services.DbSeeds
             { "Italian", "it" },
             { "Spanish", "es" },
             { "Japanese", "ja" },
-            { "Chinese", "cn" }
+            { "Chinese", "cn" },
+            { "German", "de" }
         };
 
         public MtgCardsDbSeed(MtgCardDao dao, ILogger<AbstractDbSeed<Guid, MtgCardEntity>> logger,
             MtgCardColorDao mtgCardColorDao, MtgCardSetDao mtgCardSetDao, MtgCardRarityDao mtgCardRarityDao,
             ScryfallApiClient scryfallApiClient, MtgCardLegalityDao mtgCardLegalityDao,
-            MtgCardLegalityTypeDao mtgCardLegalityTypeDao, MtgCardLanguageDao mtgCardLanguageDao, MtgCardSymbolDao mtgCardSymbolDao) : base(dao, logger)
+            MtgCardLegalityTypeDao mtgCardLegalityTypeDao, MtgCardLanguageDao mtgCardLanguageDao,
+            MtgCardSymbolDao mtgCardSymbolDao) : base(dao, logger)
         {
             _mtgCardColorDao = mtgCardColorDao;
             _mtgCardSetDao = mtgCardSetDao;
@@ -117,13 +119,13 @@ namespace DiceClub.Services.DbSeeds
             {
                 _logger.LogInformation("Download symbols");
                 using var httpClient = new HttpClient();
-                var results =  await httpClient.GetFromJsonAsync<MtgResultData<MtgSymbol>>("https://api.scryfall.com/symbology");
+                var results =
+                    await httpClient.GetFromJsonAsync<MtgResultData<MtgSymbol>>("https://api.scryfall.com/symbology");
 
                 foreach (var s in results.Data)
                 {
                     await _mtgCardSymbolDao.CreateIfNotExists(s.Symbol, s.Image, s.Description);
                 }
-                
             }
         }
     }

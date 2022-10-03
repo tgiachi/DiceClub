@@ -8,6 +8,7 @@ using CsvHelper;
 using Dasync.Collections;
 using DiceClub.Api.Data;
 using DiceClub.Api.Data.Cards;
+using DiceClub.Api.Data.Csv;
 using DiceClub.Database.Context;
 using DiceClub.Database.Dao.Cards;
 using DiceClub.Database.Entities.MtgCards;
@@ -242,8 +243,75 @@ public class CardService : AbstractBaseService<CardService>
             case CardCsvImportType.CardCastle:
                 await ImportCardCastleFormat(fileName, userId);
                 break;
+            case CardCsvImportType.HelVaultPro:
+                await ImportHelVaultProCsv(fileName, userId);
+                break;
         }
     }
+
+    public async Task ImportHelVaultProCsv(string fileName, Guid userId)
+    {
+        var records = ParseCsvFormFile<HelvaultProRow>(fileName);
+        var mtgDumpCards = new ConcurrentBag<Card>();
+        using var httpClient = new HttpClient() { BaseAddress = new Uri(_scryfallBaseUrl) };
+         await records.ParallelForEachAsync(async (row, index) =>
+        {
+            Card fetchedCard = null;
+            Logger.LogInformation("Fetching card: {CardName} [{Index}/{Count}]", row.Name, index, records.Count);
+            if (!string.IsNullOrEmpty(row.ScryfallId))
+            {
+                try
+                {
+                    var result = await httpClient.GetFromJsonAsync<Card>($"cards/{row.ScryfallId}");
+                    if (result != null)
+                    {
+                        fetchedCard = result;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Error during get card: {CardName} - {Ex}", row.Name, ex.Message);
+                }
+            }
+
+            if (fetchedCard == null)
+            {
+                try
+                {
+                    //Logger.LogWarning("Dropping card: {Name}, not found in any database", row.CardName);
+                    var searchedCards = await _scryfallApiClient.Cards.Search(row.Name, 1, new SearchOptions
+                    {
+                        Mode = SearchOptions.RollupMode.Cards,
+                        IncludeExtras = true,
+                        IncludeMultilingual = true
+                    });
+
+                    if (searchedCards.TotalCards > 0)
+                    {
+                        mtgDumpCards.Add(searchedCards.Data.First());
+                    }
+                    else
+                    {
+                        Logger.LogWarning("Dropping card {CardName}, not found in any database", row.Name);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Error during get card: {CardName} = {Ex}", row.Name, ex.Message);
+                }
+            }
+            else
+            {
+                foreach (var _ in Enumerable.Range(0, int.Parse(row.Quantity)))
+                {
+                    mtgDumpCards.Add(fetchedCard);
+                }
+            }
+        }, 10);
+
+        await AddCards(mtgDumpCards.ToList(), userId);
+        
+    } 
 
     public async Task ImportCardCastleFormat(string fileName, Guid userId)
     {
@@ -300,6 +368,8 @@ public class CardService : AbstractBaseService<CardService>
             {
                 mtgDumpCards.Add(fetchedCard);
             }
+
+            await Task.Delay(new Random().Next(1000, 1500));
         }, 10);
 
         await AddCards(mtgDumpCards.ToList(), userId);
@@ -313,8 +383,30 @@ public class CardService : AbstractBaseService<CardService>
         await cards.ParallelForEachAsync((card, l) => AddCard(card, userId, l, true), 20);
     }
 
-    public async Task AddCard(Card card, Guid userId, long index = 0, bool incQuantity = false)
+    public async Task AddCard(Card card, Guid userId, long index = 0, bool incQuantity = false, string defaultLanguage = "it")
     {
+        var forceLanguageSearchResult = await _scryfallApiClient.Cards.Search(card.Name, 1, new SearchOptions
+        {
+            Mode = SearchOptions.RollupMode.Prints,
+            IncludeMultilingual = true,
+            IncludeExtras = true
+        });
+        await Task.Delay(new Random().Next(1000, 1500));
+        
+        if (forceLanguageSearchResult != null)
+        {
+            var foreignCard =
+                forceLanguageSearchResult.Data.FirstOrDefault(s => s.Language == defaultLanguage && s.SetId == card.SetId);
+
+            if (foreignCard != null)
+            {
+                Logger.LogInformation("Found card with language: {Language} - {CardName}", defaultLanguage, foreignCard.PrintedName ?? foreignCard.Name);
+
+                card = foreignCard;
+            }
+            
+        }
+        
         var exists = await _mtgCardDao.CheckCardExistsAndIncQuantity(card.Name, card.Set, userId, incQuantity ? 1 : 0);
         try
         {
@@ -392,7 +484,7 @@ public class CardService : AbstractBaseService<CardService>
                     HighResImageUrl = imageHighRes,
                     LowResImageUrl = imageLowRes,
                     TypeLine = card.TypeLine ?? " ",
-                    Price = card.Prices.Eur ?? 0,
+                    Price = card.Prices?.Eur ?? 0,
                     MtgId = card.MtgoId,
                     RarityId = rarity.Id,
                     OwnerId = userId,
