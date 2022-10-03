@@ -1,13 +1,10 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
+name: Dicebl CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -15,25 +12,25 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - name: Cache
-      uses: actions/cache@v3.0.10
-      with:
-        # A list of files, directories, and wildcard patterns to cache and restore
-        path: ./dist
-        # An explicit key for restoring and saving the cache
-        key: dist
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: |
-        mkdir dist
-        cd src/diceclub-app/
-        npm i
-        npx vite build --outDir ../../dist
-
+      - name: Cache
+        uses: actions/cache@v3.0.10
+        with:
+          path: ./dist
+          key: dist
+      - uses: actions/checkout@v3
+      - name: .NET build
+        uses: actions/setup-dotnet@v3.0.0
+      - run: |
+          dotnet restore "src/diceclub-server/DiceClub.Web/DiceClub.Web.csproj"
+          dotnet build "src/diceclub-server/DiceClub.Web/DiceClub.Web.csproj" -c Release -o ./build
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: |
+          mkdir dist
+          cd src/diceclub-app/
+          npm i
+          npx vite build --outDir ../../dist
