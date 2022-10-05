@@ -41,7 +41,7 @@ namespace DiceClub.Web
 
             if (builder.Environment.IsDevelopment())
             {
-                logConfig = logConfig.MinimumLevel.Debug().WriteTo.Console();
+                logConfig = logConfig.MinimumLevel.Information().WriteTo.Console();
             }
             else
             {

@@ -579,4 +579,15 @@ public class CardService : AbstractBaseService<CardService>
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
         return csv.GetRecords<TFormat>().ToList();
     }
+    
+    public Task<List<MtgCardEntity>> ExportCardsByUserId(Guid userId)
+    {
+        return _mtgCardDao.QueryAsList(entities => entities.Where(s => s.OwnerId == userId)
+            .Include(s => s.Set)
+            .Include(s => s.Language)
+        );
+
+    }
+    
+    
 }
