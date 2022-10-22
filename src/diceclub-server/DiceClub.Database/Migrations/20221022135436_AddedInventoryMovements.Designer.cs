@@ -4,6 +4,7 @@ using DiceClub.Api.Data.Mtg;
 using DiceClub.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -13,9 +14,10 @@ using NpgsqlTypes;
 namespace DiceClub.Database.Migrations
 {
     [DbContext(typeof(DiceClubDbContext))]
-    partial class DiceClubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221022135436_AddedInventoryMovements")]
+    partial class AddedInventoryMovements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -271,6 +273,7 @@ namespace DiceClub.Database.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("ParserClassType")
+                        .IsRequired()
                         .HasMaxLength(400)
                         .HasColumnType("character varying(400)")
                         .HasColumnName("parser_class_type");

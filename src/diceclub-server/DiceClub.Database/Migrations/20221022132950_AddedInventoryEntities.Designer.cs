@@ -4,6 +4,7 @@ using DiceClub.Api.Data.Mtg;
 using DiceClub.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -13,9 +14,10 @@ using NpgsqlTypes;
 namespace DiceClub.Database.Migrations
 {
     [DbContext(typeof(DiceClubDbContext))]
-    partial class DiceClubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221022132950_AddedInventoryEntities")]
+    partial class AddedInventoryEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -271,6 +273,7 @@ namespace DiceClub.Database.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("ParserClassType")
+                        .IsRequired()
                         .HasMaxLength(400)
                         .HasColumnType("character varying(400)")
                         .HasColumnName("parser_class_type");
@@ -306,26 +309,6 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("description");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)")
-                        .HasColumnName("image_url");
-
-                    b.Property<string>("InventoryCode")
-                        .HasColumnType("text")
-                        .HasColumnName("inventory_code");
-
-                    b.Property<bool>("IsLocked")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_locked");
-
-                    b.Property<string>("Sku")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)")
-                        .HasColumnName("sku");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(300)
@@ -342,66 +325,7 @@ namespace DiceClub.Database.Migrations
                     b.HasIndex("CategoryId")
                         .HasDatabaseName("ix_inventories_category_id");
 
-                    b.HasIndex("Sku")
-                        .IsUnique()
-                        .HasDatabaseName("ix_inventories_sku");
-
                     b.ToTable("inventories", (string)null);
-                });
-
-            modelBuilder.Entity("DiceClub.Database.Entities.Inventory.InventoryMovementEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("end_date");
-
-                    b.Property<Guid>("InventoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("inventory_id");
-
-                    b.Property<Guid>("ReceiverId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("receiver_id");
-
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sender_id");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_inventory_movements");
-
-                    b.HasIndex("InventoryId")
-                        .HasDatabaseName("ix_inventory_movements_inventory_id");
-
-                    b.HasIndex("ReceiverId")
-                        .HasDatabaseName("ix_inventory_movements_receiver_id");
-
-                    b.HasIndex("SenderId")
-                        .HasDatabaseName("ix_inventory_movements_sender_id");
-
-                    b.ToTable("inventory_movements", (string)null);
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Inventory.InventoryQuantityEntity", b =>
@@ -1141,36 +1065,6 @@ namespace DiceClub.Database.Migrations
                         .HasConstraintName("fk_inventories_inventory_categories_category_id");
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("DiceClub.Database.Entities.Inventory.InventoryMovementEntity", b =>
-                {
-                    b.HasOne("DiceClub.Database.Entities.Inventory.InventoryEntity", "Inventory")
-                        .WithMany()
-                        .HasForeignKey("InventoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_inventory_movements_inventories_inventory_id");
-
-                    b.HasOne("DiceClub.Database.Entities.Account.DiceClubUser", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_inventory_movements_users_receiver_id");
-
-                    b.HasOne("DiceClub.Database.Entities.Account.DiceClubUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_inventory_movements_users_sender_id");
-
-                    b.Navigation("Inventory");
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Inventory.InventoryQuantityEntity", b =>

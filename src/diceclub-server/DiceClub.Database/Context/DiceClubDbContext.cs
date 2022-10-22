@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Aurora.Api.Entities.Context;
 using DiceClub.Database.Entities.Account;
 using DiceClub.Database.Entities.Deck;
+using DiceClub.Database.Entities.Inventory;
 using DiceClub.Database.Entities.MtgCards;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,6 +42,14 @@ namespace DiceClub.Database.Context
 
         public DbSet<DeckMasterEntity> DeckMaster { get; set; }
         public DbSet<DeckDetailEntity> DeckDetails { get; set; }
+
+        public DbSet<InventoryEntity> Inventories { get; set; }
+
+        public DbSet<InventoryCategoryEntity> InventoryCategories { get; set; }
+
+        public DbSet<InventoryQuantityEntity> InventoryQuantities { get; set; }
+
+        public DbSet<InventoryMovementEntity> InventoryMovements { get; set; }
 
 
         public DiceClubDbContext()
