@@ -9,6 +9,7 @@ using Aurora.Api.Utils;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using ConfigurationSubstitution;
+using DiceClub.Api.Data.Credentials;
 using DiceClub.Database.Context;
 using DiceClub.Services.Modules;
 using DiceClub.Web.Controllers.WebSocket;
@@ -69,7 +70,9 @@ namespace DiceClub.Web
                     .AddDbSeedService()
                     .AddTaskQueueService();
 
-              //  containerBuilder.RegisterEasyNetQ(builder.Configuration.GetSection("MQ")["Host"]);
+               
+
+                //  containerBuilder.RegisterEasyNetQ(builder.Configuration.GetSection("MQ")["Host"]);
 
                 if (builder.Environment.IsDevelopment())
                 {
@@ -159,7 +162,7 @@ namespace DiceClub.Web
             {
                 options.Level = CompressionLevel.SmallestSize;
             });
-            
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>

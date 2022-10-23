@@ -13,14 +13,15 @@ namespace DiceClub.Services
     public class DirectoryWatcherService : AbstractBaseService<DirectoryWatcherService>
     {
         private Dictionary<string, FileSystemWatcher> _fileSystemWatchers = new();
+        private FileSystemWatcher fsw;
         public DirectoryWatcherService(IEventBusService eventBusService, ILogger<DirectoryWatcherService> logger) : base(eventBusService, logger)
         {
-
+            StartWatchDirectory(@"C:\temp\Scan\", "");
         }
 
-        private  Task StartWatchDirectory(string directory, string tag)
+        private void StartWatchDirectory(string directory, string tag)
         {
-            var fsw = new FileSystemWatcher(directory);
+            fsw = new FileSystemWatcher(directory);
 
             fsw.NotifyFilter = NotifyFilters.Attributes
                                | NotifyFilters.CreationTime
@@ -31,17 +32,60 @@ namespace DiceClub.Services
                                | NotifyFilters.Security
                                | NotifyFilters.Size;
 
-            fsw.Filter = "*.*";
-            fsw.IncludeSubdirectories = true;
-            fsw.EnableRaisingEvents = true;
+            fsw.Filter = "*.jpg";
+
 
             fsw.Created += async (sender, args) =>
             {
-                await PublishEvent(new ImageCardCreatedEvent() {FileName = args.FullPath});
+                if (GetIdleFile(args.FullPath))
+                {
+                    await PublishEvent(new ImageCardCreatedEvent() { FileName = args.FullPath });
+                }
+
 
             };
+            //fsw.Changed += async (sender, args) =>
+            //{
+            //    await PublishEvent(new ImageCardCreatedEvent() { FileName = args.FullPath });
 
-            return Task.CompletedTask;
+            //};
+
+
+            fsw.Error += (sender, args) =>
+            {
+                Logger.LogError("Error during listen directory: {Directory} => {Error}", directory,
+                    args.GetException());
+            };
+
+
+            fsw.IncludeSubdirectories = false;
+            fsw.EnableRaisingEvents = true;
+
+        }
+
+        private static bool GetIdleFile(string path)
+        {
+            var fileIdle = false;
+            const int maximumAttemptsAllowed = 30;
+            var attemptsMade = 0;
+
+            while (!fileIdle && attemptsMade <= maximumAttemptsAllowed)
+            {
+                try
+                {
+                    using (File.Open(path, FileMode.Open, FileAccess.ReadWrite))
+                    {
+                        fileIdle = true;
+                    }
+                }
+                catch
+                {
+                    attemptsMade++;
+                    Thread.Sleep(100);
+                }
+            }
+
+            return fileIdle;
         }
     }
 }

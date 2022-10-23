@@ -20,6 +20,8 @@ namespace DiceClub.Services.Modules
             builder.RegisterType<RestPaginatorService>().AsSelf().SingleInstance();
             builder.RegisterType<CardStageService>().AsSelf().SingleInstance();
             builder.RegisterType<ExportCardService>().AsSelf().SingleInstance();
+            builder.RegisterType<TextExtractService>().AsSelf().SingleInstance().AutoActivate();
+            builder.RegisterType<DirectoryWatcherService>().AsSelf().SingleInstance().AutoActivate();
             base.Load(builder);
         }
     }
