@@ -1,6 +1,10 @@
 {
   "dependencies": [
     {
+      "name": "@types/fs-extra",
+      "type": "build"
+    },
+    {
       "name": "@types/jest",
       "type": "build"
     },
@@ -79,6 +83,14 @@
       "name": "got",
       "version": "12.3.1",
       "type": "override"
+    },
+    {
+      "name": "fs-extra",
+      "type": "runtime"
+    },
+    {
+      "name": "node-tesseract-ocr",
+      "type": "runtime"
     },
     {
       "name": "p-map",
