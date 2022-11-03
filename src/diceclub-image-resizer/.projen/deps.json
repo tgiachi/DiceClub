@@ -85,6 +85,10 @@
       "type": "override"
     },
     {
+      "name": "@google-cloud/vision",
+      "type": "runtime"
+    },
+    {
       "name": "fs-extra",
       "type": "runtime"
     },
@@ -95,6 +99,10 @@
     {
       "name": "p-map",
       "version": "4.0.0",
+      "type": "runtime"
+    },
+    {
+      "name": "scryfall-sdk",
       "type": "runtime"
     },
     {

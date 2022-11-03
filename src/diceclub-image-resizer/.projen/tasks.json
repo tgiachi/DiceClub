@@ -65,6 +65,14 @@
         }
       ]
     },
+    "debug": {
+      "name": "debug",
+      "steps": [
+        {
+          "exec": "tsc --build && node lib/index.js"
+        }
+      ]
+    },
     "default": {
       "name": "default",
       "description": "Synthesize project files",
