@@ -8,11 +8,14 @@ const project = new typescript.TypeScriptAppProject({
 
   deps: [
     'p-map@4.0.0',
+    'axios',
     'sharp',
     'node-tesseract-ocr',
     'fs-extra',
     '@google-cloud/vision',
     'scryfall-sdk',
+    'chokidar',
+    'commander',
   ] /* Runtime dependencies of this module. */,
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   devDeps: [

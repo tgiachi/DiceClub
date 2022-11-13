@@ -89,6 +89,18 @@
       "type": "runtime"
     },
     {
+      "name": "axios",
+      "type": "runtime"
+    },
+    {
+      "name": "chokidar",
+      "type": "runtime"
+    },
+    {
+      "name": "commander",
+      "type": "runtime"
+    },
+    {
       "name": "fs-extra",
       "type": "runtime"
     },

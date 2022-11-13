@@ -4,6 +4,7 @@ using DiceClub.Api.Data.Mtg;
 using DiceClub.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -13,9 +14,11 @@ using NpgsqlTypes;
 namespace DiceClub.Database.Migrations
 {
     [DbContext(typeof(DiceClubDbContext))]
-    partial class DiceClubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221113164046_addedInventoryProperties")]
+    partial class addedInventoryProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,10 +333,6 @@ namespace DiceClub.Database.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_locked");
 
-                    b.Property<Guid>("PublisherId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("publisher_id");
-
                     b.Property<string>("Sku")
                         .IsRequired()
                         .HasMaxLength(300)
@@ -367,9 +366,6 @@ namespace DiceClub.Database.Migrations
 
                     b.HasIndex("CategoryId")
                         .HasDatabaseName("ix_inventories_category_id");
-
-                    b.HasIndex("PublisherId")
-                        .HasDatabaseName("ix_inventories_publisher_id");
 
                     b.HasIndex("Sku")
                         .IsUnique()
@@ -431,32 +427,6 @@ namespace DiceClub.Database.Migrations
                         .HasDatabaseName("ix_inventory_movements_sender_id");
 
                     b.ToTable("inventory_movements", (string)null);
-                });
-
-            modelBuilder.Entity("DiceClub.Database.Entities.Inventory.InventoryPublisherEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_inventory_publishers");
-
-                    b.ToTable("inventory_publishers", (string)null);
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Inventory.InventoryQuantityEntity", b =>
@@ -1195,16 +1165,7 @@ namespace DiceClub.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_inventories_inventory_categories_category_id");
 
-                    b.HasOne("DiceClub.Database.Entities.Inventory.InventoryPublisherEntity", "Publisher")
-                        .WithMany()
-                        .HasForeignKey("PublisherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_inventories_inventory_publishers_publisher_id");
-
                     b.Navigation("Category");
-
-                    b.Navigation("Publisher");
                 });
 
             modelBuilder.Entity("DiceClub.Database.Entities.Inventory.InventoryMovementEntity", b =>

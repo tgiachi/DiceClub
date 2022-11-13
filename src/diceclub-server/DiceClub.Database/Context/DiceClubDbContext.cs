@@ -51,6 +51,7 @@ namespace DiceClub.Database.Context
 
         public DbSet<InventoryMovementEntity> InventoryMovements { get; set; }
 
+        public DbSet<InventoryPublisherEntity> InventoryPublishers { get; set; }
 
         public DiceClubDbContext()
         {

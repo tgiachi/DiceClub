@@ -44,4 +44,13 @@ public class CardsController : BaseAuthController
             .Total(result.TotalCount)
             .Build();
     }
+
+    [HttpPost]
+    [Route("add/{id}")]
+    public async Task<ActionResult<bool>> AddCardById(string id)
+    {
+        await _cardService.AddCardById(id, GetUserId());
+
+        return Ok(true);
+    }
 }

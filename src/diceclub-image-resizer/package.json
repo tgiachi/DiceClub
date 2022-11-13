@@ -39,6 +39,9 @@
   },
   "dependencies": {
     "@google-cloud/vision": "^3.0.1",
+    "axios": "*",
+    "chokidar": "^3.5.3",
+    "commander": "*",
     "fs-extra": "^10.1.0",
     "node-tesseract-ocr": "^2.2.1",
     "p-map": "4.0.0",

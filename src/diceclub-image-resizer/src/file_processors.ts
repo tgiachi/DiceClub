@@ -3,8 +3,7 @@ import vision from '@google-cloud/vision';
 import tesseract from 'node-tesseract-ocr';
 
 const client = new vision.ImageAnnotatorClient({
-  keyFilename:
-		'C:\\Users\\tgiachi\\Downloads\\translate-nmefqw-3dd83d24b91d.json',
+  keyFilename: `C:\\Users\\${process.env.USERNAME}\\Downloads\\translate-nmefqw-3dd83d24b91d.json`,
 });
 
 const processFileWithTesseract = async (

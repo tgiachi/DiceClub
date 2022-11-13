@@ -16,7 +16,7 @@ namespace DiceClub.Services
         private FileSystemWatcher fsw;
         public DirectoryWatcherService(IEventBusService eventBusService, ILogger<DirectoryWatcherService> logger) : base(eventBusService, logger)
         {
-            StartWatchDirectory(@"C:\temp\Scan\", "");
+            // StartWatchDirectory(@"C:\temp\Scan\", "");
         }
 
         private void StartWatchDirectory(string directory, string tag)

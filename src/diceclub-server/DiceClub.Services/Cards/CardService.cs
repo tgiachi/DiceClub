@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Globalization;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using Aurora.Api.Interfaces.Services;
@@ -246,6 +247,25 @@ public class CardService : AbstractBaseService<CardService>
             case CardCsvImportType.HelVaultPro:
                 await ImportHelVaultProCsv(fileName, userId);
                 break;
+        }
+    }
+
+    public async Task AddCardById(string id, Guid userId)
+    {
+        using var httpClient = new HttpClient() { BaseAddress = new Uri(_scryfallBaseUrl) };
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<Card>($"cards/{id}");
+            if (result != null)
+            {
+                await ImportCardTypes(new List<Card>() { result });
+                await ImportRarities(new List<Card>() { result });
+                await AddCard(result, userId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Error during get card: {CardName} - {Ex}", id, ex.Message);
         }
     }
 

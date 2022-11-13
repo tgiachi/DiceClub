@@ -16,14 +16,13 @@ namespace DiceClub.Database.Entities.Inventory
     [Index(nameof(Sku), IsUnique = true)]
     public class InventoryEntity : BaseGuidEntity
     {
-
         [MaxLength(300)]
         public string Title { get; set; }
 
         [MaxLength(1000)]
         public string Description { get; set; }
 
-        public InventoryCategoryEntity  Category { get; set; }
+        public InventoryCategoryEntity Category { get; set; }
 
         public Guid CategoryId { get; set; }
 
@@ -35,6 +34,20 @@ namespace DiceClub.Database.Entities.Inventory
 
         public bool IsLocked { get; set; }
 
+        public Guid PublisherId { get; set; }
+
+        public virtual InventoryPublisherEntity Publisher { get; set; }
+
         public string? InventoryCode { get; set; }
+
+        public InventoryStatusEnum InventoryStatus { get; set; }
+
+        public decimal? SoldPrice { get; set; }
+
+        public string? SoldMarket { get; set; }
+
+        public DateTime? SoldDateTime { get; set; }
+
+        public string Ean13 { get; set; }
     }
 }
