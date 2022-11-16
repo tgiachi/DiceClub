@@ -11,6 +11,7 @@
     <PackageReference Include="AWSSDK.S3" Version="3.7.101.16" />
     <PackageReference Include="AWSSDK.Textract" Version="3.7.102.9" />
     <PackageReference Include="EasyNetQ.DI.Autofac" Version="7.3.1" />
+    <PackageReference Include="Google.Apis.Books.v1" Version="1.57.0.2633" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="7.0.0" />
     <PackageReference Include="ScryfallAPI.Client" Version="3.1.0" />
   </ItemGroup>
