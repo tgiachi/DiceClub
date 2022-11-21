@@ -8,7 +8,7 @@ namespace DiceClub.Api.Data.Inventory
 {
     public class InventoryCategorySearchResult
     {
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
     }

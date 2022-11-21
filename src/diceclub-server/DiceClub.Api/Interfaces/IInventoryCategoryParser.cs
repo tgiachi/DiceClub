@@ -7,7 +7,7 @@ using DiceClub.Api.Data.Inventory;
 
 namespace DiceClub.Api.Interfaces
 {
-    public interface IInventoryCategoryParse
+    public interface IInventoryCategoryParser
     {
         Task<InventoryCategorySearchResult> Search(string ean);
     }
