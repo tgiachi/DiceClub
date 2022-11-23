@@ -22,16 +22,17 @@ namespace DiceClub.Services.Parsers
             using var bookService = new BooksService();
 
             var result = await bookService.Volumes.List(ean).ExecuteAsync();
-            if (result.Items.Count > 0)
+            if (result.Items != null)
             {
-                return new InventoryCategorySearchResult
+                if (result.Items.Count > 0)
                 {
-                    Title = result.Items[0].VolumeInfo.Title,
-                    Description = result.Items[0].VolumeInfo.Description
-
-                };
+                    return new InventoryCategorySearchResult
+                    {
+                        Title = result.Items[0].VolumeInfo.Title,
+                        Description = result.Items[0].VolumeInfo.Description
+                    };
+                }
             }
-
             return null;
         }
 
